@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOLA ERG Content Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #C0392B;
+    --gold: #D4A017;
+    --dark: #1A1A2E;
+    --cream: #FAF6F0;
+    --green: #1D6A4A;
+    --warm-gray: #6B6560;
+    --border: #E8DDD0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  header {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--red), var(--gold), var(--green), var(--red));
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+  }
+
+  header h1 span { color: var(--gold); }
+
+  header p {
+    margin-top: 0.5rem;
+    color: #aaa;
+    font-size: 0.95rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  /* TAB NAV */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--warm-gray);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover { color: var(--dark); }
+  .tab-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 700; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* EMAIL CARDS */
+  .email-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+
+  .email-header {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .email-header.monday { background: linear-gradient(135deg, #C0392B11, #D4A01711); }
+  .email-header.thursday { background: linear-gradient(135deg, #1D6A4A11, #1A1A2E11); }
+
+  .email-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .monday .email-badge { background: var(--red); color: white; }
+  .thursday .email-badge { background: var(--green); color: white; }
+
+  .email-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+  }
+
+  .email-date { margin-left: auto; color: var(--warm-gray); font-size: 0.85rem; }
+
+  .email-body { padding: 1.5rem; }
+
+  .email-section {
+    margin-bottom: 1.4rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .email-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 0.4rem;
+  }
+
+  .section-content { font-size: 0.95rem; }
+  .section-content strong { color: var(--red); }
+
+  .quote-block {
+    border-left: 3px solid var(--gold);
+    padding-left: 1rem;
+    font-style: italic;
+    color: var(--warm-gray);
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+
+  .quote-block em {
+    display: block;
+    font-size: 1.05rem;
+    color: var(--dark);
+    font-style: italic;
+    margin-bottom: 0.2rem;
+  }
+
+  /* SPREADSHEET TABLE */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  thead tr {
+    background: var(--dark);
+    color: var(--cream);
+  }
+
+  thead th {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  tbody tr:nth-child(even) { background: #F9F4EE; }
+  tbody tr:hover { background: #F0E8DC; }
+
+  tbody td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .cat-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .cat-political { background: #FDECEA; color: #C0392B; }
+  .cat-cultural { background: #FEF9EC; color: #B8860B; }
+  .cat-science { background: #EAF6F0; color: #1D6A4A; }
+  .cat-sports { background: #EAF0FE; color: #2C5FC4; }
+  .cat-literary { background: #F5EAF6; color: #7B2C8F; }
+  .cat-us-latino { background: #FFF3E8; color: #C05C00; }
+  .cat-holiday { background: #FDE8F5; color: #8B1A6B; }
+
+  /* Archive functionality */
+  .archived-row { display: none; }
+  .archived-row.show-archived { display: table-row; opacity: 0.45; }
+  .archived-row.show-archived td { text-decoration: line-through; color: #999; }
+  .archived-row.show-archived .cat-badge { opacity: 0.5; }
+
+  .archive-btn {
+    padding: 0.2rem 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f5f0ea;
+    color: #6B6560;
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .archive-btn:hover { background: var(--red); color: white; border-color: var(--red); }
+  .restore-btn { background: #EAF6F0; color: #1D6A4A; border-color: #1D6A4A; }
+  .restore-btn:hover { background: #1D6A4A; color: white; }
+
+  .archive-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .toggle-archived-btn {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toggle-archived-btn:hover { background: var(--dark); color: white; border-color: var(--dark); }
+  .archived-count {
+    font-size: 0.8rem;
+    color: var(--warm-gray);
+    font-style: italic;
+  }
+
+  .month-header td {
+    background: var(--dark);
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    letter-spacing: 1px;
+  }
+
+  /* FORMAT GUIDE */
+  .format-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 640px) { .format-grid { grid-template-columns: 1fr; } }
+
+  .format-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 1.4rem;
+  }
+
+  .format-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .format-card ul { padding-left: 1.2rem; }
+  .format-card li { margin-bottom: 0.4rem; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HOLA <span>Content Calendar</span></h1>
+  <p>Hispanic/Latino Organization for Leadership & Advancement — ERG Email Program</p>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('emails')">📧 Email Drafts</button>
+    <button class="tab-btn" onclick="showTab('calendar')">📅 Content Calendar</button>
+    <button class="tab-btn" onclick="showTab('format')">📋 Format Guide</button>
+  </div>
+
+  <!-- EMAIL DRAFTS TAB -->
+  <div id="tab-emails" class="tab-panel active">
+
+    <!-- MAY 18 MONDAY -->
+    <div class="email-card">
+      <div class="email-header monday">
+        <span class="email-badge">Monday</span>
+        <h3>Semana Nueva — Week of May 18</h3>
+        <span class="email-date">May 18, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Greeting</div>
+          <div class="section-content">¡Buenos días, HOLA familia! Hope everyone is starting the week with energy. We're excited to kick off something new — each Monday we'll be sharing a piece of Hispanic and Latino history to start our week with a little cultural pride and context.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📅 This Week in Hispanic/Latino History</div>
+          <div class="section-content">
+            <strong>May 18, 1911 — The Mexican Revolution Reshapes a Nation</strong><br><br>
+            On this week in 1911, revolutionary leader Francisco Madero entered Mexico City as Porfirio Díaz resigned after 35 years in power — one of the most dramatic political turning points in Latin American history. The Mexican Revolution (1910–1920) was not just a political uprising; it was a profound social movement that reshaped land ownership, workers' rights, and national identity across Mexico. Its echoes are still felt today in Mexican culture, muralism, and political thought — and in the communities many of our colleagues and families trace their roots to.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎉 Upcoming HOLA Events</div>
+          <div class="section-content">
+            • <strong>Stay tuned</strong> — we're planning our first HOLA gathering. Details coming soon!<br>
+            • Have an event idea? Reply to this email — we'd love your input.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">💬 Discussion Prompt</div>
+          <div class="section-content">The Mexican Revolution produced some of the most iconic art and literature in history — from Diego Rivera's murals to Mariano Azuela's novels. <strong>Is there a piece of art, music, food, or family story connected to your heritage that you feel proud of? Hit reply and share!</strong></div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🌎 Quote of the Week</div>
+          <div class="quote-block">
+            <em>"Intentaron enterrarnos. No sabían que éramos semillas."</em><br>
+            <span style="font-size:0.85rem; color:#8a8480;">"They tried to bury us. They didn't know we were seeds." — Mexican proverb</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAY 21 THURSDAY -->
+    <div class="email-card">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — May 21</h3>
+        <span class="email-date">May 21, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">Almost to the weekend, HOLA familia! Before you head out, here's a little more to chew on from this week's history theme — plus a cultural recommendation to take into your weekend.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>The Women of the Mexican Revolution</strong><br><br>
+            When we talk about the Revolution, we often hear about Zapata and Villa — but the <em>Soldaderas</em> (also called <em>Adelitas</em>) were women who fought alongside men, served as nurses and spies, and in many cases led troops themselves. Figures like Juana Ramona de Flores ("La Tigresa") commanded guerrilla units. Their contributions were largely written out of official history for decades. The <em>Adelita</em> became a powerful symbol of Latina strength and resilience that still resonates in folk music and art today.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎵 Cultural Spotlight — Music</div>
+          <div class="section-content">
+            <strong>Listen this weekend:</strong> <em>"La Adelita"</em> — a corrido (Mexican folk ballad) from the Revolution era. It's one of the oldest and most beloved songs in Mexican folk tradition, and it's a direct tribute to the Soldaderas. You can find numerous versions on Spotify and YouTube — try the Mariachi Vargas de Tecalitlán version for an iconic take.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">We'd love to know more about <em>you</em>. In the coming weeks, we'll be asking members to volunteer to write a short "heritage spotlight" — just 3–4 sentences about a place, tradition, or story from your background. No pressure, just an open invitation. Reply if you're interested!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Weekend Note</div>
+          <div class="section-content">Enjoy the weekend, everyone. See you Monday for a fresh Semana Nueva. ¡Hasta luego!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAY 25 MONDAY -->
+    <div class="email-card">
+      <div class="email-header monday">
+        <span class="email-badge">Monday</span>
+        <h3>Semana Nueva — Week of May 25</h3>
+        <span class="email-date">May 25, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Greeting</div>
+          <div class="section-content">¡Buenos días, HOLA familia! Hope everyone had a great weekend. This week we're heading to the southern tip of South America for a story about the birth of a nation — and a political moment that still shapes Argentina's national identity today.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📅 This Week in Hispanic/Latino History</div>
+          <div class="section-content">
+            <strong>May 25, 1810 — Argentina's May Revolution & the Primera Junta</strong><br><br>
+            On May 25, 1810, Buenos Aires formed the Primera Junta — the first independent governing body in what would become Argentina. It wasn't a full declaration of independence yet (that came in 1816), but it was the critical first crack in Spanish colonial authority in the Río de la Plata region. The date is now celebrated as <em>Día de la Patria</em>, Argentina's national day. Every year, Argentines gather in the Plaza de Mayo — the same square where it all began — to mark the moment their nation started becoming itself.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎉 Upcoming HOLA Events</div>
+          <div class="section-content">• Stay tuned — more details coming soon on our first HOLA gathering!<br>• Have a heritage story to share? We're still looking for volunteers for our Member Spotlight series — just reply to this email.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">💬 Discussion Prompt</div>
+          <div class="section-content"><strong>Argentina celebrates its national day in the same plaza where independence began over 200 years ago. Is there a place — a city, a town square, a family home — that holds deep historical meaning for your family or heritage? Hit reply and tell us about it.</strong></div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🌎 Quote of the Week</div>
+          <div class="quote-block">
+            <em>"Una nación no es algo que se hace en un día."</em><br>
+            <span style="font-size:0.85rem; color:#8a8480;">"A nation is not something that is made in one day." — José de San Martín, Argentine liberator</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAY 28 THURSDAY -->
+    <div class="email-card">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — May 28</h3>
+        <span class="email-date">May 28, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">¡Hola, familia! Almost to the weekend. Let's close out Argentina week with a literary deep dive and a cultural pick to take into your days off.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>José Hernández & Martín Fierro — Born May 28, 1834</strong><br><br>
+            Today marks the birthday of José Hernández, the Argentine poet who wrote <em>Martín Fierro</em> (1872) — widely considered the national epic of Argentina. The poem follows a gaucho (Argentine cowboy) named Martín Fierro who is forced into military service, loses his family, and wanders the pampas in exile. It's a story about identity, injustice, and what it means to belong to a land. Hernández wrote it as a protest against the brutal conscription policies of the Argentine government — giving a voice to a people who had none. Today <em>Martín Fierro</em> is quoted the way Americans quote the Constitution: as a source of national character and values.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🍽️ Cultural Spotlight — Food</div>
+          <div class="section-content">
+            <strong>Try this weekend: Empanadas Argentinas</strong><br><br>
+            No dish is more deeply tied to Argentine identity than the empanada. Every region has its own filling — beef with hard-boiled egg and olives in the northwest, humita (corn and cheese) in Salta, spinach and ricotta in Buenos Aires. If you've never made them at home, they're a surprisingly fun weekend project. Search "empanadas salteñas recipe" for a classic starting point — and bonus, they freeze beautifully.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">We've had a few members express interest in contributing a <strong>Heritage Spotlight</strong> — a short 3–4 sentence story about their background. We'll start featuring these in our Week 4 Thursday emails. If you'd like to be one of the first, just reply with your story or a few notes and we'll help shape it up. No writing experience needed!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Weekend Note</div>
+          <div class="section-content">Enjoy the long weekend, everyone — and if it's a rotating Friday off for you, make the most of it! ¡Hasta el lunes!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JUNE 2 MONDAY -->
+    <div class="email-card">
+      <div class="email-header monday">
+        <span class="email-badge">Monday</span>
+        <h3>Semana Nueva — Week of June 2</h3>
+        <span class="email-date">June 2, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Greeting</div>
+          <div class="section-content">¡Feliz lunes, HOLA familia! Welcome to June — and to a story that connects Latin American history to one of the greatest environmental breakthroughs of the 20th century.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📅 This Week in Hispanic/Latino History</div>
+          <div class="section-content">
+            <strong>June 1995 — Mario Molina Accepts the Nobel Prize in Chemistry</strong><br><br>
+            In 1995, Mexican-born scientist Mario Molina became the first Mexican citizen to win the Nobel Prize in Chemistry. His research, conducted alongside F. Sherwood Rowland, proved that chlorofluorocarbons (CFCs) were destroying the ozone layer — work that directly led to the Montreal Protocol, the most successful international environmental treaty in history. Molina grew up in Mexico City, trained in Germany and the United States, and spent his career proving that rigorous science could change global policy. He passed away in 2020, but his legacy protects every person on Earth.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎉 Upcoming HOLA Events</div>
+          <div class="section-content">• Details coming soon — watch this space!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">💬 Discussion Prompt</div>
+          <div class="section-content"><strong>Mario Molina's work was ignored for years before it was accepted. Has there been a moment in your career where you had to persist through skepticism? Reply and share your story.</strong></div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🌎 Quote of the Week</div>
+          <div class="quote-block">
+            "Science is not only a discipline of reason, but also one of romance and passion." — Mario Molina<br>
+            <span style="font-size:0.85rem; color:#8a8480;">(Originally stated in English)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JUNE 5 THURSDAY -->
+    <div class="email-card">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — June 5</h3>
+        <span class="email-date">June 5, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">¡Hola, familia! The weekend is close. Let's close out this week's theme with a deeper look and a great cultural recommendation.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>Ellen Ochoa — First Latina in Space</strong><br><br>
+            In April 1993, Ellen Ochoa became the first Hispanic woman to travel to space aboard the Space Shuttle Discovery. Born in Los Angeles to a Mexican-American family, she holds three patents in optical systems and went on to become Director of NASA's Johnson Space Center. Ochoa has said she was inspired by reading about people who pursued their passions — and that she didn't originally plan on becoming an astronaut, but let curiosity lead her. She represents an extraordinary through-line of Latino scientific excellence.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📚 Cultural Spotlight — Book</div>
+          <div class="section-content">
+            <strong>Read this month:</strong> <em>The Alchemist</em> by Paulo Coelho (Brazilian author, translated from Portuguese). A short, powerful novel about following your purpose across the world. It has sold over 65 million copies and remains one of the most widely read books ever written by a Latin American author. Perfect for a long weekend afternoon.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">We're building our <strong>Heritage Spotlight</strong> series — short 3–4 sentence stories from members about their background, culture, or family history. A few brave volunteers are already signed up. Want in? Just reply to this email.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Weekend Note</div>
+          <div class="section-content">Have a great weekend everyone. ¡Hasta el lunes!</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- JUNE 8 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of June 8</h3><span class="email-date">June 8, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we celebrate the first Latin American writer to win the Nobel Prize in Literature — a Chilean poet and educator whose words still echo across the continent.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>June 8, 1889 — Birthday of Gabriela Mistral</strong><br><br>Born Lucila Godoy Alcayaga in Chile's Elqui Valley, Gabriela Mistral spent years as a rural schoolteacher before the world discovered her as a poet. In 1945 she became the first Latin American and first woman from the Americas to win the Nobel Prize in Literature. The Swedish Academy honored her "lyric poetry which, inspired by powerful emotions, has made her name a symbol of the idealistic aspirations of the entire Latin American world." She dedicated her Nobel Prize to the children of Latin America.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Stay tuned — details coming soon on our next HOLA gathering!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Mistral spent years as a schoolteacher before the world discovered her as a poet. Who is a teacher, mentor, or quiet hero from your community whose impact you still feel today? Hit reply and share.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Somos culpables de muchos errores y muchas faltas, pero nuestro peor crimen es abandonar a los niños."</em><br><span style="font-size:0.85rem;color:#8a8480;">"We are guilty of many errors and faults, but our worst crime is abandoning the children." — Gabriela Mistral</span></div></div>
+    </div></div>
+
+    <!-- JUNE 11 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — June 11</h3><span class="email-date">June 11, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! This Thursday we go deeper on Puerto Rico's complicated relationship with the United States — a story of identity, sovereignty, and unbreakable resilience.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>The Foraker Act (1900) — Puerto Rico's Uneasy Status</strong><br><br>When the U.S. acquired Puerto Rico from Spain after the Spanish-American War in 1898, Puerto Ricans entered a legal limbo that persists today. The Foraker Act of 1900 made Puerto Rico a U.S. territory without granting citizenship. The Jones Act of 1917 eventually granted citizenship — just in time to draft Puerto Ricans into WWI. The questions of statehood, independence, or commonwealth status remain central to Puerto Rican political life and identity. Whatever one's view, Puerto Rico's story is inseparable from the broader story of Latino identity in the United States.</div></div>
+      <div class="email-section"><div class="section-label">🍽️ Cultural Spotlight — Food</div><div class="section-content"><strong>Cook this weekend:</strong> <em>Mofongo</em> — Puerto Rico's most beloved dish. Fried green plantains mashed with garlic, salt, and chicharrón, shaped into a mound and filled with shrimp, chicken, or vegetables in savory broth. Search "mofongo de camarones" for a classic version.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">We are still looking for Heritage Spotlight volunteers. Share 3–4 sentences about a tradition or family memory from your background — just reply to this email.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a wonderful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- JUNE 15 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of June 15</h3><span class="email-date">June 15, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Feliz lunes, HOLA familia! This week we look at a policy that changed nearly 800,000 lives overnight and sparked a national conversation about belonging that continues today.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>June 15, 2012 — DACA Announced</strong><br><br>On June 15, 2012, President Obama announced the Deferred Action for Childhood Arrivals (DACA) program, offering protection from deportation to young people brought to the United States as children. These Dreamers had grown up in American schools and communities — many knowing no other home. At its peak, DACA protected nearly 800,000 people. The program has faced ongoing legal and political battles, but the human stories behind it remain constant: people who built careers, families, and communities in the United States and have contributed to it in every field imaginable.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Watch this space — more details coming soon!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Belonging is something many of us in this community have had to define for ourselves — sometimes across countries, languages, or generations. What does "home" mean to you? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"No soy de aquí ni soy de allá."</em><br><span style="font-size:0.85rem;color:#8a8480;">"I am not from here nor am I from there." — from the song by Facundo Cabral, a sentiment shared across the Latino diaspora</span></div></div>
+    </div></div>
+
+    <!-- JUNE 18 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — June 18</h3><span class="email-date">June 18, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Turn on some Celia Cruz — because today we celebrate the Queen of Salsa. ¡Azúcar!</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>Celia Cruz — Born June 18, 1925</strong><br><br>Born in Havana, Celia Cruz rose to fame with the Sonora Matancera before going into exile when Castro came to power in 1959 — she never returned, even to bury her parents. In the United States she became a symbol of Cuban resilience, recording over 70 albums and winning multiple Grammys. Her signature cry — "¡Azúcar!" — was not just a catchphrase; it was a declaration of joy in the face of everything life had taken from her.</div></div>
+      <div class="email-section"><div class="section-label">🎵 Cultural Spotlight — Music</div><div class="section-content"><strong>Listen this weekend:</strong> Start with <em>"La Vida Es un Carnaval"</em> — Celia's most iconic message of resilience. Then try <em>"Quimbara"</em> for pure Afro-Cuban power, and <em>"Bemba Colorá"</em> for her early Cuban sound. If you have never danced to Celia Cruz, this weekend is the time.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Celia Cruz found joy even in exile. This week's prompt: what's one thing about your heritage that you carry with genuine pride, no matter where you are? Reply and share.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Turn up the salsa, familia. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- JUNE 22 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of June 22</h3><span class="email-date">June 22, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week: a decisive victory on the Venezuelan plains — and this Wednesday, millions will walk backwards into the ocean at midnight. We'll explain Thursday.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>June 24, 1821 — Battle of Carabobo</strong><br><br>Simón Bolívar's forces defeated the Spanish royalist army at the plains of Carabobo on June 24, 1821, effectively securing Venezuelan independence after a decade of war. It was the moment Bolívar's dream of a free northern South America became irreversible. June 24 is now celebrated as Venezuela's Armed Forces Day and remains one of the defining moments of Latin American liberation history.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Also This Week — Día de San Juan (June 24)</div><div class="section-content">Wednesday, June 24 is the Feast of St. John the Baptist — one of Puerto Rico's most beloved celebrations. Tradition: walk backwards into the ocean seven times at midnight for good luck. More on the story Thursday!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Bolívar spent twenty years fighting for his dream. Is there something in your own life you have pursued that long — a goal, a value, a vision — that you refused to give up on? Reply and share.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Un pueblo ignorante es un instrumento ciego de su propia destrucción."</em><br><span style="font-size:0.85rem;color:#8a8480;">"An ignorant people is a blind instrument of their own destruction." — Simón Bolívar</span></div></div>
+    </div></div>
+
+    <!-- JUNE 25 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — June 25</h3><span class="email-date">June 25, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! A full Puerto Rico celebration this Thursday — a beloved ocean tradition and a baseball legend. ¡Wepa!</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive — Día de San Juan</div><div class="section-content"><strong>Walking Backwards into the Ocean</strong><br><br>Día de San Juan Bautista (June 24) is Puerto Rico's patron saint feast day and one of its most joyful summer celebrations. The island fills with music and the famous midnight tradition: walking backwards into the ocean seven times to receive good fortune. The custom merges pre-Christian water purification rituals with Catholic feast-day observance. In Puerto Rico, this is one of the biggest parties of the year — celebrated on every beach from Luquillo to Rincón.</div></div>
+      <div class="email-section"><div class="section-label">🏆 Also This Week — Roberto Clemente</div><div class="section-content">Roberto Clemente's 3,000th hit (September 30, 1972) is honored this week. It was his last. Three months later he died delivering aid to earthquake victims in Nicaragua. His number 21 was retired across all of Major League Baseball — the only player besides Jackie Robinson to receive that honor.</div></div>
+      <div class="email-section"><div class="section-label">🎵 Cultural Spotlight — Music</div><div class="section-content"><strong>Listen this weekend:</strong> <em>La Borinqueña</em> — Puerto Rico's anthem, written by Lola Rodríguez de Tió in 1868 as a revolutionary call to arms. Then put on some <em>bomba y plena</em> — Puerto Rico's African-rooted percussion tradition, the heartbeat of island culture.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Puerto Rican heritage or a connection to the island? We'd love a Heritage Spotlight from your community. Reply with 3–4 sentences about your background.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a beautiful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- JUNE 29 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of June 29</h3><span class="email-date">June 29, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Feliz lunes, HOLA familia! Today is the Feast of Saints Peter and Paul — a major celebration across Latin America — and the anniversary of one of the greatest moments in football history.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>June 29 — Día de San Pedro y San Pablo + Pelé's First World Cup (1958)</strong><br><br>June 29 is the Feast of Sts. Peter and Paul, a national holiday in Peru celebrated with boat processions honoring San Pedro as patron of fishermen, and with festivals across Colombia and Chile. It is also the anniversary of Brazil's first World Cup victory in 1958, when a 17-year-old named Pelé scored two goals in the final against Sweden, becoming the youngest World Cup champion in history. Two celebrations of faith, culture, and sport in a single day.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Details coming soon!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Pelé was 17 when he changed the world. Is there a moment from your own life — or your family's — when youth, courage, or raw talent made something extraordinary happen? Reply and tell us.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"O sucesso não é acidente. É trabalho duro, perseverança, aprendizado, estudo, sacrifício e, acima de tudo, amor pelo que você está fazendo."</em><br><span style="font-size:0.85rem;color:#8a8480;">"Success is no accident. It is hard work, perseverance, learning, study, sacrifice and, above all, love of what you do." — Pelé (Portuguese)</span></div></div>
+    </div></div>
+
+    <!-- JULY 6 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of July 6</h3><span class="email-date">July 6, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! Happy July — we enter the richest stretch of the year for Latin American independence celebrations. This week: Venezuela leads the way.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>July 5, 1811 — Venezuela Declares Independence</strong><br><br>On July 5, 1811, Venezuela became the first Spanish-speaking nation in South America to formally declare independence from Spain. Signed in Caracas by the First Venezuelan Republic, it was a bold act that set off a chain of liberation across the continent. The First Republic would collapse within a year — but the spark would never die. After another decade of war under Bolívar, independence was finally secured. July 5 remains Venezuela's most important national holiday.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Stay tuned — details coming soon!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Venezuela's first republic failed before it could take hold — but it planted the seed for everything that followed. Have you ever worked toward something, watched it collapse, and had to start over? What did you learn? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Si la naturaleza se opone, lucharemos contra ella y haremos que nos obedezca."</em><br><span style="font-size:0.85rem;color:#8a8480;">"If nature opposes us, we will fight against her and make her obey." — Simón Bolívar, after the 1812 Caracas earthquake</span></div></div>
+    </div></div>
+
+    <!-- JULY 9 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — July 9</h3><span class="email-date">July 9, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! ¡Feliz Día de la Independencia Argentina! Today we celebrate one of South America's most dramatic declarations of freedom — and close with a food recommendation worth firing up the grill for.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>July 9, 1816 — Argentina's Independence Day</strong><br><br>Argentina's independence was declared in Tucumán — deliberately not Buenos Aires — as a symbolic act of defiance against royalist influence in the capital. The declaration was read aloud in Spanish, Quechua, and Aymara, acknowledging the indigenous nations whose lands and labor formed the country. Manuel Belgrano designed the celeste-and-white flag after the color of the sky. July 9 is celebrated nationwide with asados, folk music, and that distinctive Argentinian flag waving from every window.</div></div>
+      <div class="email-section"><div class="section-label">🔥 Cultural Spotlight — Food</div><div class="section-content"><strong>Grill this weekend:</strong> <em>Asado Argentino</em> — the great Argentine barbecue tradition, slow-cooked over wood or charcoal (never gas). Cuts include short ribs, chorizo, morcilla, and vacío. The secret is patience — an asado cannot be rushed. Search "asado argentino chimichurri" and commit the afternoon.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Argentina's independence was declared in multiple languages. How many languages does our HOLA community speak? Reply and let us know what languages you carry from your heritage.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a wonderful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- JULY 13 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of July 13</h3><span class="email-date">July 13, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we celebrate one of the most recognizable artists in human history — a woman who turned personal pain into a global symbol of resilience and identity.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>July 6, 1907 — Birthday of Frida Kahlo</strong><br><br>Born in Coyoacán, Mexico City, Frida Kahlo was nearly killed at 18 in a bus accident that shattered her spine, collarbone, and pelvis. She spent her recovery teaching herself to paint in bed using a specially built easel and a mirror mounted above her. Over her lifetime she created 143 paintings — most self-portraits — that became some of the most powerful explorations of identity, gender, and pain ever put on canvas. Frida once said she painted her own reality because it was the one she knew best.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Watch this space for upcoming HOLA gatherings!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Frida Kahlo found her art inside her pain. Have you ever turned a difficult experience into something meaningful or creative? Reply and share your story.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Pies, ¿para qué los quiero, si tengo alas para volar?"</em><br><span style="font-size:0.85rem;color:#8a8480;">"Feet, what do I need you for when I have wings to fly?" — Frida Kahlo</span></div></div>
+    </div></div>
+
+    <!-- JULY 16 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — July 16</h3><span class="email-date">July 16, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! This Thursday we travel to one of the most extraordinary cities on Earth — built at the edge of the sky — and open the floor for a member story.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>La Paz, Bolivia — Founded July 16, 1548</strong><br><br>La Paz sits at nearly 12,000 feet above sea level — the highest administrative capital in the world. Founded by Spanish conquistadors on top of an existing Aymara settlement, today it is a city of cable cars threading between neighborhoods at different altitudes, Aymara markets beside colonial churches, and the vibrant Witches' Market where healers sell herbs alongside modern storefronts. Bolivia's indigenous population — over 60% identify as indigenous — is woven into every corner of city life.</div></div>
+      <div class="email-section"><div class="section-label">📚 Cultural Spotlight — Book</div><div class="section-content"><strong>Read this month:</strong> <em>The Matter of Desire</em> by Bolivian novelist Edmundo Paz Soldán — a contemporary exploration of identity, exile, and belonging written in both Spanish and English. For something classic, <em>Juan de la Rosa</em> by Nataniel Aguirre is Bolivia's foundational national novel.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner — Heritage Spotlight</div><div class="section-content">This is our Member Heritage Spotlight week. Share 3–4 sentences about a place, tradition, or family memory from your heritage. All backgrounds welcome — just reply to this email.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a great weekend! ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- JULY 20 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of July 20</h3><span class="email-date">July 20, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Feliz lunes, HOLA familia! ¡Feliz Día de la Independencia a todos los colombianos! This week we celebrate a revolution that started — improbably — with an argument over a flower vase.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>July 20, 1810 — Colombia's Independence Day</strong><br><br>On July 20, 1810, Creole patriots in Bogotá asked a Spanish merchant to lend them a flower vase for a reception. He refused — with an insult. The public confrontation grew into a street uprising, and by day's end a provisional junta had been formed. This moment — El Florero de Llorente — sparked Colombia's road to full independence in 1819. July 20 is now celebrated with parades, banderas, and the sound of cumbia and vallenato filling the streets.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Stay tuned for upcoming HOLA events!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Big movements often start with a small moment of defiance. Has there been a small moment in your life that turned into something much larger? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"La vida no es la que uno vivió, sino la que uno recuerda y cómo la recuerda para contarla."</em><br><span style="font-size:0.85rem;color:#8a8480;">"Life is not what one lived, but what one remembers and how one remembers it in order to recount it." — Gabriel García Márquez</span></div></div>
+    </div></div>
+
+    <!-- JULY 23 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — July 23</h3><span class="email-date">July 23, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Today we honor a Spanish poet who captured the soul of his country — and whose murder by fascists made him immortal. Plus a music recommendation that carries his spirit.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>Federico García Lorca — Born July 5, 1898</strong><br><br>Born in Granada, Andalusia, García Lorca became the most beloved Spanish poet of the 20th century. His concept of <em>duende</em> — the mysterious creative force that gives art its power — remains one of the most important ideas in Spanish artistic culture. In 1936 he was arrested by Nationalist forces and executed at 38. His body was never found. His murder became a symbol of what fascism does to beauty and truth, and his work has never stopped being read.</div></div>
+      <div class="email-section"><div class="section-label">🎵 Cultural Spotlight — Music</div><div class="section-content"><strong>Listen this weekend:</strong> Explore flamenco — the art form Lorca loved above all others. Start with Camarón de la Isla's <em>"La Leyenda del Tiempo"</em> (1979), the album that modernized flamenco without losing its duende. Then try Paco de Lucía for pure guitar mastery.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Lorca believed art should disturb the comfortable and comfort the disturbed. Is there a piece of art from your cultural background that has genuinely moved you? Reply and share it.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Enjoy the weekend, everyone. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- JULY 27 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of July 27</h3><span class="email-date">July 27, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! A double feature this week — a saint honored across Spain and Puerto Rico, and a labor hero who changed American history with three words.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>July 25 — Feast of Santiago &amp; the Delano Grape Strike (1965)</strong><br><br>July 25 is the Feast of Santiago, patron saint of Spain, whose shrine in Santiago de Compostela draws millions of pilgrims along the Camino each year. Puerto Rico also celebrates Santiago with summer Fiestas Patronales. This week also marks the anniversary of César Chávez and Dolores Huerta's United Farm Workers beginning their historic Delano Grape Strike — a five-year boycott that drew national attention to farmworker conditions and produced the first union contracts in California agricultural history.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Watch this space!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>César Chávez said the fight for workers' rights is never really over — it just changes form. Where do you see the spirit of "¡Sí, se puede!" alive in your own workplace or community today? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"¡Sí, se puede!"</em><br><span style="font-size:0.85rem;color:#8a8480;">"Yes, we can!" — César Chávez and Dolores Huerta, rallying cry of the United Farm Workers</span></div></div>
+    </div></div>
+
+    <!-- JULY 30 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — July 30</h3><span class="email-date">July 30, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! We close July with Peru's Fiestas Patrias — one of the great independence celebrations in all of Latin America — and a space for a member story from our own HOLA community.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>July 28, 1821 — Peru Independence Day (Fiestas Patrias)</strong><br><br>General José de San Martín stood in Lima's Plaza Mayor on July 28, 1821 and proclaimed Peru's independence before a crowd of thousands. Fiestas Patrias is a two-day national celebration — July 28 and 29 — filled with military parades, the iconic marinera dance, and tables groaning with ceviche, lomo saltado, anticuchos, and picarones. For Peruvians at home and in the diaspora, it is one of the most joyful weekends of the year.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner — Heritage Spotlight</div><div class="section-content">This is our Member Heritage Spotlight week. We'd love to feature a HOLA member's story — 3–4 sentences about your background, a tradition, or a family memory. All heritages welcome. Just reply to this email.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a wonderful weekend and a great close to July! ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- AUGUST 3 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of August 3</h3><span class="email-date">August 3, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! Welcome to August. This week we mark one of the most consequential departures in human history — three ships that left a Spanish harbor and changed the world forever.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>August 3, 1492 — Columbus Departs Palos de la Frontera</strong><br><br>On August 3, 1492, Columbus departed Spain with three ships and sailed into the unknown, arriving in the Bahamas on October 12. The legacy of 1492 is deeply complex: it brought catastrophic disease, displacement, and enslavement to indigenous peoples, and simultaneously began the cultural fusion that created the Latino world as we know it. Latino identity is inseparable from this history — not as victims or inheritors, but as a people who survived, adapted, resisted, and ultimately created something entirely new.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Hispanic Heritage Month is six weeks away! Watch this space for HHM announcements.</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Latino identity is built on layers — indigenous, European, African, and more. Which thread of your own heritage do you feel most connected to? Reply and share.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Nuestra América."</em><br><span style="font-size:0.85rem;color:#8a8480;">"Our America" — title of José Martí's 1891 landmark essay calling for Latin American unity and identity on its own terms, not defined by Europe or the United States.</span></div></div>
+    </div></div>
+
+    <!-- AUGUST 6 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — August 6</h3><span class="email-date">August 6, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! ¡Feliz Día de la Independencia boliviana! Today we celebrate the country literally named after the Liberator — and close with a street food recommendation you need in your life.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>August 6, 1825 — Bolivia's Independence</strong><br><br>Bolivia is one of only two countries named after a living person at the time of its founding — Simón Bolívar himself. Bolivia's geography is extraordinary: the Altiplano at over 12,000 feet, lush Yungas valleys, the Amazon, and the Atacama Desert — all within one country. Its indigenous population is the largest percentage-wise of any country in the Americas, with Aymara and Quechua as co-official languages alongside Spanish.</div></div>
+      <div class="email-section"><div class="section-label">🍽️ Cultural Spotlight — Food</div><div class="section-content"><strong>Try this weekend:</strong> <em>Salteñas bolivianas</em> — Bolivia's take on the empanada, often considered the finest in South America. Unlike dry Argentine empanadas, Bolivian salteñas are filled with a juicy sweet-and-spicy stew of meat, potato, peas, olives, and egg in a slightly sweet baked crust. Notoriously messy to eat — which is part of the experience. Search "salteñas bolivianas recipe."</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Bolivia has 37 officially recognized indigenous nations. This week: how many generations back can you trace your family roots? Reply and share where your story begins.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a great weekend! ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- AUGUST 10 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of August 10</h3><span class="email-date">August 10, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we head to Ecuador — for the first cry of independence in all of South America, and a story about what it costs to be first.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>August 10, 1809 — Ecuador's "Primer Grito de Independencia"</strong><br><br>On August 10, 1809, Quiteño patriots formed the first autonomous junta in South America. It was crushed within months and its leaders were executed. Ecuador would not achieve full independence until 1822 under Bolívar. But August 10 is honored as the date that started it all — the first spark in the continent's long liberation fire. A reminder that being first often means paying the highest price.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Hispanic Heritage Month is five weeks away — stay tuned for special HHM programming!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Ecuador's first independence movement failed — but it lit the fire for everything that followed. Have you ever been part of an effort that didn't succeed but planted seeds for something greater? Reply and share.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"El primer grito de independencia en América del Sur se escuchó en Quito."</em><br><span style="font-size:0.85rem;color:#8a8480;">"The first cry of independence in South America was heard in Quito." — historical tribute to the 1809 uprising</span></div></div>
+    </div></div>
+
+    <!-- AUGUST 13 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — August 13</h3><span class="email-date">August 13, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Today we mark one of the most pivotal — and devastating — moments in the history of the Americas: the fall of Tenochtitlán in 1521.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>August 13, 1521 — The Fall of Tenochtitlán</strong><br><br>Before Cortés arrived, Tenochtitlán was one of the largest cities in the world — built on an island in a lake, with aqueducts, floating gardens, and a population of perhaps 200,000 people at a time when London had fewer than 100,000. The 75-day siege ended August 13, 1521, when Emperor Cuauhtémoc was captured and the greatest pre-Columbian city in North America lay in ruins. Mexico City was built on top of it — and Aztec ruins still occasionally surface beneath its streets today.</div></div>
+      <div class="email-section"><div class="section-label">🎬 Cultural Spotlight — Film</div><div class="section-content"><strong>Watch this weekend:</strong> The BBC series <em>"Ancient Invisible Cities: Mexico City"</em> uses ground-penetrating radar to reveal what lies beneath modern Mexico City — an extraordinary look at Tenochtitlán's layout and scale. Free to find online and genuinely mind-blowing.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner — Heritage Spotlight</div><div class="section-content">This is our Member Heritage Spotlight week. Share 3–4 sentences about your background, a tradition, or a family memory. All heritages welcome — just reply.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a wonderful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- AUGUST 17 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of August 17</h3><span class="email-date">August 17, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we celebrate the man who liberated six countries and became the most consequential figure in the history of the Western Hemisphere — El Libertador himself.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>July 24, 1783 — Birthday of Simón Bolívar</strong><br><br>Born in Caracas to a wealthy Creole family, educated in Europe and inflamed by Enlightenment ideals, Bolívar spent two decades in relentless military campaigns liberating Venezuela, Colombia, Ecuador, Peru, Bolivia, and Panama. He served as president of multiple nations simultaneously. He died in 1830 at 47 — penniless, exiled, his dream of a unified Gran Colombia already fracturing. History gave him the last word: his image appears on the currency, monuments, and national consciousness of nearly every country he touched.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Hispanic Heritage Month begins September 15 — three weeks away! Special programming is planned.</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Bolívar's dream of a unified Latin America never fully came to pass — but the idea has never died. What does pan-Latino solidarity mean to you personally? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Moral y luces son nuestras primeras necesidades."</em><br><span style="font-size:0.85rem;color:#8a8480;">"Morality and enlightenment are our greatest needs." — Simón Bolívar</span></div></div>
+    </div></div>
+
+    <!-- AUGUST 20 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — August 20</h3><span class="email-date">August 20, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Today we celebrate a Mexican poet and novelist who wrote about gender and indigenous identity decades before those were mainstream conversations — with unflinching brilliance.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>Rosario Castellanos — Born August 25, 1925</strong><br><br>Born in Mexico City and raised in Chiapas, Rosario Castellanos became one of Mexico's most celebrated poets and novelists. Her 1957 novel <em>Balún-Canán</em> — told from the perspective of a young girl in Chiapas — is considered a masterwork of Mexican literature. She later served as Mexico's ambassador to Israel, where she died in an accident in 1974 at age 49. Her poem "Meditación en el umbral" remains one of the most powerful feminist texts in the Spanish language.</div></div>
+      <div class="email-section"><div class="section-label">🎵 Cultural Spotlight — Music</div><div class="section-content"><strong>Listen this weekend:</strong> <em>Chavela Vargas</em> — the Costa Rican-Mexican singer who transformed ranchera music and whose raw emotional power is unmatched. Start with <em>"La Llorona"</em> and <em>"Paloma Negra."</em> Few voices in Latin music history carry the weight and beauty of Chavela's.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Castellanos wrote about being a woman in 1950s Mexico with remarkable courage. Who in your family's history do you consider a quiet revolutionary? Reply and share.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a great weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- AUGUST 24 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of August 24</h3><span class="email-date">August 24, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we celebrate a Bronx-born daughter of Puerto Rican immigrants who became one of the most powerful jurists in American history.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>August 6, 2009 — Sonia Sotomayor Confirmed as Supreme Court Justice</strong><br><br>Sonia Sotomayor became the first Hispanic and only the third woman on the U.S. Supreme Court on August 6, 2009. Born in the South Bronx to Puerto Rican immigrant parents, she grew up in a housing project, was diagnosed with juvenile diabetes at 8, and taught herself to read with Nancy Drew novels. She graduated summa cum laude from Princeton, earned her law degree from Yale, and described herself in her confirmation hearings as a "wise Latina" — a phrase that became both controversial and celebrated as a declaration of the value of lived experience in the law.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Hispanic Heritage Month begins September 15 — two weeks away! Stay tuned.</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Sotomayor has said her background gave the Court a perspective it needed. Has your own cultural background or lived experience ever given you an insight that others in the room didn't have? Reply and share.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block">"Until we get equality in education, we will not have an equal society." — Sonia Sotomayor<br><span style="font-size:0.85rem;color:#8a8480;">(Originally stated in English)</span></div></div>
+    </div></div>
+
+    <!-- AUGUST 27 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — August 27</h3><span class="email-date">August 27, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! We close August with the man who put Latin American literature on the world map — the father of magical realism, the voice of Macondo. Ladies and gentlemen: Gabo.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>Gabriel García Márquez — Born August 6, 1927</strong><br><br>Born in Aracataca, Colombia, García Márquez grew up in a town that became the model for Macondo, the fictional village at the heart of <em>Cien años de soledad</em>. Published in 1967, it sold 50 million copies and was translated into 46 languages. The Nobel Prize committee in 1982 called it "the most important work of fiction written in Spanish since Don Quixote." His genius was making the impossible feel more true than reality.</div></div>
+      <div class="email-section"><div class="section-label">📚 Cultural Spotlight — Book</div><div class="section-content"><strong>Read this fall:</strong> If you have not read <em>Cien años de soledad</em> — read it now. If you have, revisit <em>El amor en los tiempos del cólera</em> — García Márquez's most romantic novel, a meditation on love, patience, and the passage of time. Netflix's series adaptation of <em>Cien años</em> is also beautiful and worth watching.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Gabo said he wrote to tell the stories of people who had no other way to be heard. Is there a story from your family or community that deserves to be told? Reply — if you're willing, we'd be honored to feature it as a Heritage Spotlight.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a wonderful close to August. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 7 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of September 7</h3><span class="email-date">September 7, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! Welcome to September — the countdown to Hispanic Heritage Month begins! But first: ¡Feliz Dia da Independência do Brasil!</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>September 7, 1822 — Brazil's Independence Day</strong><br><br>On September 7, 1822, Crown Prince Dom Pedro I declared Brazil's independence with the famous <em>Grito do Ipiranga</em>: "Independência ou morte!" — "Independence or death!" Unlike most Latin American independence movements, Brazil's was declared by a member of the Portuguese royal family, making the transition relatively peaceful. Brazil is home to the largest population of African descent outside Africa, and its culture — music, food, language — reflects that profound African heritage throughout.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Hispanic Heritage Month — One Week Away!</div><div class="section-content">Hispanic Heritage Month begins September 15 — eight days from today. This year's HOLA theme: <strong>"Raíces y Alas" — Roots and Wings.</strong> Special content planned all month. Stay tuned!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>"Raíces y Alas" — roots and wings. What roots ground you, and what wings have carried you forward? Reply — your story may be featured in an upcoming HHM email!</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Independência ou morte!"</em><br><span style="font-size:0.85rem;color:#8a8480;">"Independence or death!" — Dom Pedro I, September 7, 1822 (Portuguese)</span></div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 10 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — September 10</h3><span class="email-date">September 10, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Five days until Hispanic Heritage Month! This Thursday: why does HHM start on September 15? The answer is more extraordinary than you might think.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive — Why September 15?</div><div class="section-content"><strong>Five Countries, One Day — The Origins of Hispanic Heritage Month</strong><br><br>Hispanic Heritage Month runs September 15 through October 15. The start date is intentional: September 15, 1821 is the independence day of Costa Rica, El Salvador, Guatemala, Honduras, and Nicaragua — five nations that broke from Spain simultaneously. September 16 is Mexico's Independence Day. September 18 is Chile's. Congress created the month-long observance in 1988, expanding a week established by President Johnson in 1968, to honor the cultures, histories, and contributions of Americans with roots across the Spanish-speaking world.</div></div>
+      <div class="email-section"><div class="section-label">🍽️ Cultural Spotlight — Food</div><div class="section-content"><strong>Cook this weekend:</strong> <em>Tamales</em> — in honor of the Central American independence nations. Every country has a version: Guatemalan tamales wrapped in banana leaves, Salvadoran tamales stuffed with turkey at Christmas, Mexican tamales varying by region. Pick a country and make a batch. They are labor-intensive — and absolutely worth it.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">HHM kicks off Monday! We are looking for Heritage Spotlight volunteers throughout the month. Reply to this email to share your story.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Get ready — Hispanic Heritage Month starts Monday! ¡Hasta el lunes y que viva nuestra herencia!</div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 14 MONDAY — HHM KICKOFF -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>🎉 ¡HISPANIC HERITAGE MONTH KICKOFF! — September 14</h3><span class="email-date">September 14, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡BUENOS DÍAS, HOLA FAMILIA! Hispanic Heritage Month begins TOMORROW — and we are kicking it off with full energy. For the next 30 days, our emails go deeper, shine brighter, and celebrate louder. ¡Vamos!</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week — Five Nations, One Day</div><div class="section-content"><strong>September 15, 1821 — Central American Independence Day</strong><br><br>Tomorrow, September 15, is the independence day of Costa Rica, El Salvador, Guatemala, Honduras, and Nicaragua — five countries that broke from Spain simultaneously, coordinating the declaration by courier on horseback across the isthmus. In Guatemala City, the original Act of Independence is still illuminated in a glass case in the Palacio Nacional. September 15 is celebrated with torch relays, student parades, marimba music, and five different flags waving side by side. Happy Independence Day to every Central American member of our HOLA community!</div></div>
+      <div class="email-section"><div class="section-label">🎉 HHM Theme: "Raíces y Alas"</div><div class="section-content">• This month's theme: <strong>Roots and Wings — Raíces y Alas</strong><br>• Weekly Heritage Spotlights every Thursday — reply to volunteer your story<br>• Special content all month honoring the full breadth of Hispanic and Latino heritage</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>What does celebrating your heritage at work mean to you? What would you most want your colleagues to know about where you come from? Hit reply — your words may appear in an upcoming email!</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Ser hispano es cargar con la historia de un continente entero."</em><br><span style="font-size:0.85rem;color:#8a8480;">"To be Hispanic is to carry the history of an entire continent." — widely attributed in Latin American cultural writing</span></div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 17 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — September 17</h3><span class="email-date">September 17, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, HOLA familia! Tuesday was Mexico's Independence Day. If you missed El Grito at midnight, here's the full story — plus a music spotlight that is pure celebration.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive — El Grito de Independencia</div><div class="section-content"><strong>September 16, 1810 — Father Hidalgo Rings the Bell</strong><br><br>In the early hours of September 16, 1810, Father Miguel Hidalgo rang the church bell in Dolores, Guanajuato, and called his parish to arms against Spanish rule — the Grito de Dolores. Every September 15 at 11 PM, the President of Mexico stands on the balcony of the National Palace and delivers the Grito to hundreds of thousands in the Zócalo. The cry — "¡Viva México! ¡Viva la Independencia! ¡Vivan los héroes!" — echoes simultaneously in town squares across the entire country and in Mexican communities worldwide. It is one of the great public rituals of any nation on Earth.</div></div>
+      <div class="email-section"><div class="section-label">🎵 Cultural Spotlight — Music</div><div class="section-content"><strong>Listen this weekend:</strong> <em>Mariachi Vargas de Tecalitlán</em> — the greatest mariachi ensemble in history, founded in 1898. Start with <em>"Cielito Lindo"</em> and <em>"Guadalajara."</em> Then Vicente Fernández's <em>"Volver Volver"</em> — one of the essential songs of Mexican musical identity.</div></div>
+      <div class="email-section"><div class="section-label">📣 HHM Heritage Spotlight</div><div class="section-content">We are featuring member Heritage Spotlights every Thursday in September and October. Mexican heritage? Reply now — we'd love to feature you in honor of Mexico's Independence Week.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">¡Que viva México! Have a wonderful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 21 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of September 21</h3><span class="email-date">September 21, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we honor the woman who co-created one of the most powerful phrases in American labor history — and has spent her entire life proving it true.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>April 10, 1930 — Birthday of Dolores Huerta</strong><br><br>Dolores Clara Fernández Huerta was born in New Mexico, grew up in California's Central Valley farmworking communities, and became a schoolteacher — until she decided she could do more good organizing the people her students went home to. She co-founded the National Farm Workers Association with César Chávez in 1962, coined "¡Sí, se puede!" and helped win the first union contracts in California agricultural history. Now in her nineties, Dolores Huerta continues to organize, march, and remind the world that justice is a verb.</div></div>
+      <div class="email-section"><div class="section-label">🎉 HHM — Week 2</div><div class="section-content">We are in the second week of Hispanic Heritage Month! Heritage Spotlight stories are still coming in — reply to this email to share yours.</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>"¡Sí, se puede!" started as a farmworkers' rallying cry and became a global statement of possibility. Where in your own life do you most need to hear those words right now? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"¡Sí, se puede!"</em><br><span style="font-size:0.85rem;color:#8a8480;">"Yes, we can!" — Dolores Huerta and César Chávez, rallying cry of the United Farm Workers</span></div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 24 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — September 24</h3><span class="email-date">September 24, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! This Thursday we spotlight the Dominican Republic — home to one of the most unique independence stories in all the Americas.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>Dominican Republic — Independence from Haiti (1844)</strong><br><br>The Dominican Republic is the only country in the Americas to have won independence from another independent nation rather than from a European power. On February 27, 1844, patriots led by Juan Pablo Duarte broke away from Haitian rule, which had unified the island of Hispaniola since 1822. Dominican identity is a complex blend of African, indigenous Taíno, and Spanish colonial heritage. Merengue — the national music — reflects all three, with African percussion, European accordion, and indigenous güira at its heart.</div></div>
+      <div class="email-section"><div class="section-label">📣 HHM Heritage Spotlight</div><div class="section-content">This week's Heritage Spotlight is open for a HOLA member to share their story. Dominican, Caribbean, or any Latin American heritage — reply with 3–4 sentences and we'll feature you!</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a beautiful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- SEPTEMBER 28 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of September 28</h3><span class="email-date">September 28, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! As Hispanic Heritage Month moves into its third week, we close September with the poet who more than any other put the Spanish language on the world's literary stage.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>October 1971 — Pablo Neruda Wins the Nobel Prize in Literature</strong><br><br>Pablo Neruda — born Ricardo Neftalí Reyes Basoalto in Parral, Chile in 1904 — published his first poem at 13 and became Chile's greatest literary export. He wrote about love (<em>Veinte poemas de amor</em>), political exile (<em>Canto General</em>), and everyday objects (<em>Odas elementales</em>) with equal passion. The Nobel committee in 1971 honored "a poetry that with the action of an elemental force brings alive a continent's destiny and dreams." He died in 1973, twelve days after the coup that overthrew his friend Salvador Allende.</div></div>
+      <div class="email-section"><div class="section-label">🎉 HHM — Week 3</div><div class="section-content">One more week of Hispanic Heritage Month after this one — keep the replies and stories coming!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Neruda wrote about love, politics, exile, tomatoes, and the sea with equal passion. Is there a poem — in any language — that has stayed with you? Share its title or a line by hitting reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Puedo escribir los versos más tristes esta noche."</em><br><span style="font-size:0.85rem;color:#8a8480;">"Tonight I can write the saddest lines." — Pablo Neruda, opening of Poem XX, <em>Veinte poemas de amor</em></span></div></div>
+    </div></div>
+
+    <!-- OCTOBER 1 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — October 1</h3><span class="email-date">October 1, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Hispanic Heritage Month is at its midpoint — and this Thursday we shine a light on a thread of Latino identity that is too often overlooked: the African roots woven into the heart of Latin American culture.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive — Afro-Latino Heritage</div><div class="section-content"><strong>The African Roots of Latin America</strong><br><br>Over 90% of the approximately 12 million enslaved Africans transported to the Americas went to Latin America and the Caribbean, not North America. African cultural traditions survived in the music (cumbia, salsa, samba, merengue, bomba), food (rice and beans, plantains, mole), religion (Candomblé, Santería), and language. Celia Cruz, Roberto Clemente, and Pelé — all featured in our emails this year — carry Afro-Latino heritage. Today approximately 130 million people in Latin America identify as Afro-descendant. Their story is essential, not supplemental, to the Latino story.</div></div>
+      <div class="email-section"><div class="section-label">🎬 Cultural Spotlight — Film</div><div class="section-content"><strong>Watch this weekend:</strong> <em>Chico &amp; Rita</em> (2010) — an animated Cuban film tracing the Afro-Cuban jazz and mambo era from Havana to New York. Visually stunning, musically extraordinary, and available on multiple streaming platforms.</div></div>
+      <div class="email-section"><div class="section-label">📣 HHM Heritage Spotlight</div><div class="section-content">Afro-Latino heritage or a connection to this part of the Latino story? We'd be honored to feature your spotlight this month. Reply with your story.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a beautiful weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- OCTOBER 5 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of October 5</h3><span class="email-date">October 5, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! HHM is in its final stretch. This week: Neruda's birthday on October 12, and a conversation about the most debated date in Latin American history.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>October 12 — Neruda's Birthday &amp; Día de la Raza</strong><br><br>Pablo Neruda was born on October 12, 1904 — the same date as Columbus Day, Día de la Raza, and Indigenous Peoples Day. The most celebrated poet of Latin America, born on the day that marks both the arrival of Europeans in the Americas and the beginning of the world that produced him. October 12 is observed across Latin America under different names: Día de la Hispanidad in Spain, Día de la Raza in much of Latin America celebrating mestizo identity, and Indigenous Peoples Day honoring the communities whose worlds were transformed by Columbus's arrival.</div></div>
+      <div class="email-section"><div class="section-label">🎉 HHM — Final Stretch!</div><div class="section-content">Hispanic Heritage Month ends October 15! Thank you to everyone who has replied, shared a story, or contributed a Heritage Spotlight. You are what makes HOLA worth building.</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>October 12 means different things to different people in our community. What does the day mean to you — or to your family's heritage? Hit reply and share your perspective.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Quiero hacer contigo lo que la primavera hace con los cerezos."</em><br><span style="font-size:0.85rem;color:#8a8480;">"I want to do with you what spring does with the cherry trees." — Pablo Neruda</span></div></div>
+    </div></div>
+
+    <!-- OCTOBER 8 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — October 8</h3><span class="email-date">October 8, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Not every figure in Latin American history is easy to discuss — and that's precisely why some deserve a conversation. Today: Che Guevara, a man whose image is everywhere and whose legacy is genuinely complex.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>October 9, 1967 — Che Guevara Killed in Bolivia</strong><br><br>Argentine physician and revolutionary Ernesto "Che" Guevara was captured and executed in the Bolivian jungle on October 9, 1967. His face, immortalized by Alberto Korda's 1960 photograph, became one of the most reproduced images of the 20th century. To some, he is a symbol of anti-imperialist resistance. To others — Cuban exiles, families of his firing squad victims, those who lived under regimes he inspired — he represents brutality and authoritarian violence. He is a genuinely contested figure, and that complexity is worth honoring rather than flattening in either direction.</div></div>
+      <div class="email-section"><div class="section-label">🎬 Cultural Spotlight — Film</div><div class="section-content"><strong>Watch this weekend:</strong> <em>The Motorcycle Diaries</em> (2004) — based on Che's early travel memoir before his political radicalization. Beautifully shot across South America, it captures a young man's first encounter with the poverty and inequality of his continent. An excellent conversation starter regardless of your views on his later life.</div></div>
+      <div class="email-section"><div class="section-label">📣 HHM Heritage Spotlight</div><div class="section-content">Final Heritage Spotlight week of HHM 2026. Reply now with your 3–4 sentence story — we'll feature members in next Thursday's closing email.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a great weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- OCTOBER 12 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of October 12</h3><span class="email-date">October 12, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! Today is October 12 — a date with many names, many meanings, and a story that belongs to all of us. This is our final full week of Hispanic Heritage Month. Let's make it count.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week — Día de la Raza / Indigenous Peoples Day</div><div class="section-content"><strong>October 12 — A Date With Many Names</strong><br><br>In the United States: Columbus Day. In Spain: Día de la Hispanidad. In much of Latin America: Día de la Raza, celebrating the mestizo identity forged from the meeting of European, indigenous, and African peoples. In an increasing number of U.S. states: Indigenous Peoples Day, centering the communities whose worlds were transformed by 1492. All of these observances are responding to the same moment — and each reflects a different inheritance from it. The richness of our community is that we can hold all of these perspectives at once.</div></div>
+      <div class="email-section"><div class="section-label">🎉 HHM Final Week!</div><div class="section-content">Hispanic Heritage Month closes Thursday, October 15. Thank you to every member who contributed, replied, or simply showed up for these emails week after week.</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>How do you personally think about October 12? Is there a name for the day that resonates most with your background? Hit reply and share your perspective.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"La raza cósmica."</em><br><span style="font-size:0.85rem;color:#8a8480;">"The cosmic race" — José Vasconcelos (1925), his vision of the mestizo people as a synthesis of all world civilizations — a concept both celebrated and critiqued across Latin American thought.</span></div></div>
+    </div></div>
+
+    <!-- OCTOBER 15 THURSDAY — HHM CLOSE -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — October 15 — ¡Hasta el próximo año, HHM!</h3><span class="email-date">October 15, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, HOLA familia! Today Hispanic Heritage Month closes — but our stories do not. This Thursday is for gratitude, reflection, and looking ahead.</div></div>
+      <div class="email-section"><div class="section-label">📖 HHM Reflection</div><div class="section-content"><strong>30 Days of Roots and Wings — Thank You</strong><br><br>For thirty days we shared history, poetry, music, food, science, sport, and struggle. We traveled from Tenochtitlán to the farmworker fields of California, from the flamenco stages of Andalusia to the murals of East Los Angeles. We heard from members who shared their own stories — stories no history book contains. Thank you for being part of it.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner — Your Voice</div><div class="section-content"><strong>What topic, person, or country would you most like to see featured next year?</strong> What did we miss? What should we do more of? Reply — your feedback shapes the 2027 program.</div></div>
+      <div class="email-section"><div class="section-label">🗓️ What's Next</div><div class="section-content">Semana Nueva and Fin de Semana continue every Monday and Thursday through year-end — with Día de los Muertos, Virgen de Guadalupe, Las Posadas, Nochebuena, and New Year's traditions still to come. Stay with us. ¡Hasta el lunes, familia — y gracias de corazón!</div></div>
+    </div></div>
+
+    <!-- OCTOBER 19 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of October 19</h3><span class="email-date">October 19, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! HHM is behind us — but the history and culture keep coming. This week we travel to 16th-century Spain for the man who invented the modern novel.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>September 29, 1547 — Birthday of Miguel de Cervantes</strong><br><br>Cervantes fought at Lepanto, was enslaved by Barbary pirates for five years, worked as a tax collector, was excommunicated, and imprisoned for debt — then wrote the greatest novel in the Spanish language in his fifties. <em>Don Quixote</em> (1605, 1615) is considered the first modern novel and has been translated more than any book in history except the Bible. The story of an ordinary man who dreams heroic dreams has never stopped being relevant.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• Watch this space — something special is coming for the holiday season!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Don Quixote tilts at windmills he mistakes for giants — because he insists on seeing the world as more heroic than it is. Is there a "windmill" in your own life you have charged at anyway? Reply and share.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"La pluma es la lengua del alma."</em><br><span style="font-size:0.85rem;color:#8a8480;">"The pen is the tongue of the soul." — Miguel de Cervantes</span></div></div>
+    </div></div>
+
+    <!-- OCTOBER 22 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — October 22</h3><span class="email-date">October 22, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! This Thursday we celebrate one of the greatest athletes Spain ever produced — and close with an autumn comfort food spotlight.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive</div><div class="section-content"><strong>Arantxa Sánchez Vicario — Spain's Greatest Tennis Champion</strong><br><br>Born in Barcelona in 1971, Arantxa Sánchez Vicario burst onto the world stage at 17, defeating Steffi Graf at the 1989 French Open in one of the greatest Grand Slam upsets in history. She won four Grand Slam singles titles, reached World No. 1, and became Spain's most decorated tennis player before Rafael Nadal arrived. Her relentless baseline defense and refusal to give up any point embodied the Spanish fighting spirit known as <em>la garra</em> — and paved the way for a generation of Spanish tennis greatness.</div></div>
+      <div class="email-section"><div class="section-label">🍽️ Cultural Spotlight — Food</div><div class="section-content"><strong>Cook this weekend:</strong> <em>Fabada Asturiana</em> — Spain's great autumn stew from the northern Asturias region. White beans slow-cooked with chorizo, morcilla, and cured ham in rich smoky broth. Exactly the meal you want when the weather turns cool. Search "fabada asturiana recipe" for a perfect weekend project.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">We're building our holiday season content and would love Heritage Spotlights from members with Spanish, Canarian, or Basque heritage. Reply with your 3–4 sentence story!</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a great weekend! ¡Hasta el lunes!</div></div>
+    </div></div>
+
+    <!-- OCTOBER 26 MONDAY -->
+    <div class="email-card"><div class="email-header monday"><span class="email-badge">Monday</span><h3>Semana Nueva — Week of October 26</h3><span class="email-date">October 26, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Greeting</div><div class="section-content">¡Buenos días, HOLA familia! This week we celebrate the Spanish artist who changed how humanity sees — a genius from Málaga who proved the rules of reality are optional.</div></div>
+      <div class="email-section"><div class="section-label">📅 This Week in Hispanic/Latino History</div><div class="section-content"><strong>October 25, 1881 — Birthday of Pablo Picasso</strong><br><br>Born in Málaga, Spain, Picasso co-founded Cubism with Georges Braque — breaking objects into geometric fragments to show multiple perspectives at once. Over 91 years he created more than 20,000 works. His 1937 painting <em>Guernica</em> — a response to the Nazi bombing of a Basque village during the Spanish Civil War — is arguably the most powerful anti-war statement in the history of art. Picasso never returned to Spain under Franco's dictatorship. He died in 1973, four months before Franco did.</div></div>
+      <div class="email-section"><div class="section-label">🎉 Upcoming HOLA Events</div><div class="section-content">• The holiday season is approaching — watch for special HOLA programming coming soon!</div></div>
+      <div class="email-section"><div class="section-label">💬 Discussion Prompt</div><div class="section-content"><strong>Picasso said: "Every child is an artist. The problem is how to remain an artist once we grow up." What creative outlet have you held onto from childhood? Hit reply.</strong></div></div>
+      <div class="email-section"><div class="section-label">🌎 Quote of the Week</div><div class="quote-block"><em>"Yo no busco, encuentro."</em><br><span style="font-size:0.85rem;color:#8a8480;">"I do not seek; I find." — Pablo Picasso</span></div></div>
+    </div></div>
+
+    <!-- OCTOBER 29 THURSDAY -->
+    <div class="email-card"><div class="email-header thursday"><span class="email-badge">Thursday</span><h3>Fin de Semana — October 29</h3><span class="email-date">October 29, 2026</span></div><div class="email-body">
+      <div class="email-section"><div class="section-label">👋 Opener</div><div class="section-content">¡Hola, familia! Halloween is Saturday — but in the Latino calendar, the real magic begins Sunday. This weekend families across Mexico and Latin America begin building their ofrendas. Here's how.</div></div>
+      <div class="email-section"><div class="section-label">📖 Deep Dive — How to Build an Ofrenda</div><div class="section-content"><strong>The Ofrenda — A Guide</strong><br><br>An ofrenda is built in layers — typically two or three tiers representing Earth and heaven. What goes on it: <em>Cempasúchil</em> (marigolds) — their scent guides spirits home. <em>Copal incense</em> — purifies the air. <em>Photos of the departed</em> — they anchor the altar. <em>Their favorite foods and drinks</em> — offered so they can enjoy them one more time. <em>A glass of water</em> — to quench their thirst after the journey. <em>Candles</em> — to light the way. <em>Pan de muerto</em> — the sweet bread baked for this day. You do not need to be Mexican or Catholic to build one. An ofrenda for anyone you have lost is an act of love that transcends tradition.</div></div>
+      <div class="email-section"><div class="section-label">🍽️ Cultural Spotlight — Food</div><div class="section-content"><strong>Bake this weekend:</strong> <em>Pan de Muerto</em> — soft, sweet, anise-flavored bread decorated with bone shapes and a skull, baked specifically for Día de los Muertos. Search "pan de muerto recipe" and fill your kitchen with the scent of orange zest and anise. One of the most beautiful baking traditions in Latino culture.</div></div>
+      <div class="email-section"><div class="section-label">📣 Community Corner</div><div class="section-content">Monday is Día de los Muertos. If you would like to share the name of a loved one you are honoring on your ofrenda, reply to this email. We will mention them in Monday's email as a community memorial. ❤️</div></div>
+      <div class="email-section"><div class="section-label">🗓️ Weekend Note</div><div class="section-content">Have a wonderful Halloween and a meaningful Día de los Muertos preparation weekend. ¡Hasta el lunes!</div></div>
+    </div></div>
+
+
+
+  </div><!-- end email tab -->
+
+  <!-- NOVEMBER EMAIL DRAFTS injected before email tab close -->
+
+    <!-- NOV 2 MONDAY — Día de los Muertos -->
+    <div class="email-card" style="display:none" id="nov-email-section"><!-- shown by JS --></div>
+
+  <!-- hidden marker, real cards below added to email tab by JS -->
+
+    <div class="email-card nov-email">
+      <div class="email-header monday">
+        <span class="email-badge">Monday</span>
+        <h3>Semana Nueva — Week of November 2</h3>
+        <span class="email-date">Nov 2, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Greeting</div>
+          <div class="section-content">¡Buen lunes, HOLA familia! This week we step into one of the most misunderstood — and most beautiful — celebrations in the Latino world. Welcome to Día de los Muertos.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📅 This Week in Hispanic/Latino History</div>
+          <div class="section-content">
+            <strong>November 1–2 — Día de los Muertos</strong><br><br>
+            Día de los Muertos is not Halloween. It is not a day of mourning. It is a joyful, vibrant reunion — a belief rooted in 3,000 years of Aztec tradition that death is not the end, and that once a year, our loved ones can find their way back to us through the scent of marigolds and the warmth of candlelight. The Aztecs celebrated an entire month-long festival honoring Mictecacihuatl, the Lady of the Dead. When Spanish colonizers arrived, they moved the observance to align with Catholic All Saints' and All Souls' Days — but they could not erase it. What emerged was one of the world's most extraordinary examples of cultural survival and fusion.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎉 Upcoming HOLA Events</div>
+          <div class="section-content">• Watch this space for upcoming HOLA events — more details coming soon!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">💬 Discussion Prompt</div>
+          <div class="section-content"><strong>Many Latino families build an ofrenda — an altar with photos, food, and mementos for loved ones who have passed. Does your family have a tradition of honoring ancestors around this time of year? Reply and share — we'd love to hear about it.</strong></div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🌎 Quote of the Week</div>
+          <div class="quote-block">
+            <em>"La muerte no existe, la gente sólo muere cuando la olvidan."</em><br>
+            <span style="font-size:0.85rem; color:#8a8480;">"Death does not exist; people only die when they are forgotten." — Isabel Allende</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOV 5 THURSDAY — Día de los Muertos Deep Dive -->
+    <div class="email-card nov-email">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — November 5</h3>
+        <span class="email-date">Nov 5, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">¡Hola, familia! Let's go deeper on this week's theme — and close out with a cultural recommendation that might become a new tradition in your household.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>The Ofrenda — What Goes on the Altar and Why</strong><br><br>
+            A Día de los Muertos ofrenda is not random decoration — every element has meaning. <em>Cempasúchil</em> (marigolds) are placed to guide spirits home with their scent. <em>Copal</em> incense purifies the air. Photos of the departed anchor the altar. Their favorite foods and drinks are offered so they can enjoy them one more time. A glass of water quenches their thirst after the long journey. Salt purifies. Candles light the way. The tradition varies by region — Oaxacan ofrendas look different from those in Michoacán or the U.S. — but the intention is universal: love doesn't stop at death.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎬 Cultural Spotlight — Film</div>
+          <div class="section-content">
+            <strong>Watch this weekend:</strong> <em>Coco</em> (Pixar, 2017). Whatever you may think of animated films, this one is worth your time — it was developed in close collaboration with Mexican cultural consultants and does one of the most accurate and moving portrayals of Día de los Muertos ever put on screen. Bring a tissue. It's also a beautiful gateway conversation if you have children or younger family members curious about the tradition.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">We're looking for members to contribute a <strong>Heritage Spotlight</strong> for December — a 3–4 sentence story about a holiday tradition, family memory, or cultural practice from your background. It can be about any holiday, any country, any tradition. Reply if you'd like to be featured.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Weekend Note</div>
+          <div class="section-content">Have a wonderful weekend, everyone. ¡Hasta el lunes!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEC 14 MONDAY — Virgen de Guadalupe -->
+    <div class="email-card nov-email">
+      <div class="email-header monday">
+        <span class="email-badge">Monday</span>
+        <h3>Semana Nueva — Week of December 14</h3>
+        <span class="email-date">Dec 14, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Greeting</div>
+          <div class="section-content">¡Buenos días, HOLA familia! The holiday season is here — and this week we celebrate one of the most sacred dates in the Latino Catholic calendar. Welcome to the week of the Virgen de Guadalupe.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📅 This Week in Hispanic/Latino History</div>
+          <div class="section-content">
+            <strong>December 12 — Día de Nuestra Señora de Guadalupe</strong><br><br>
+            In 1531, a recently converted indigenous man named Juan Diego reported an apparition of the Virgin Mary on the hill of Tepeyac, just north of Mexico City. The image she left imprinted on his tilma (cloak) — a woman with indigenous features, surrounded by light — became one of the most reproduced images in human history. The Virgen de Guadalupe is more than a religious icon; she is a symbol of mestizo identity, of the fusion of indigenous and Spanish cultures, and of protection for the poor. Millions travel to the Basilica of Guadalupe in Mexico City every December 12, making it one of the most visited Catholic shrines in the world.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎉 Upcoming HOLA Events</div>
+          <div class="section-content">• The holiday season is a great time to connect — stay tuned for HOLA year-end details!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">💬 Discussion Prompt</div>
+          <div class="section-content"><strong>The Virgen de Guadalupe appears on everything from church altarpieces to lowrider hoods to tattoos — she means something different to everyone who carries her image. What symbols or figures from your heritage feel like home to you? Hit reply.</strong></div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🌎 Quote of the Week</div>
+          <div class="quote-block">
+            <em>"No estoy yo aquí, que soy tu madre?"</em><br>
+            <span style="font-size:0.85rem; color:#8a8480;">"Am I not here, I who am your mother?" — The words of the Virgen de Guadalupe to Juan Diego, from the Nican Mopohua (1556)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEC 17 THURSDAY — Las Posadas -->
+    <div class="email-card nov-email">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — December 17</h3>
+        <span class="email-date">Dec 17, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">¡Hola, familia! Las Posadas began yesterday — and the streets of neighborhoods from Guadalajara to East Los Angeles are filled with candlelight and song. Let's celebrate.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>Las Posadas — Nine Nights of Song and Community</strong><br><br>
+            Las Posadas (December 16–24) reenact the journey of Mary and Joseph seeking shelter in Bethlehem — <em>posada</em> means "inn" or "lodging" in Spanish. Each night, a procession moves through the neighborhood carrying candles and figures of Mary and Joseph. Participants sing a traditional call-and-response song: pilgrims outside begging for shelter, hosts inside refusing — until finally the doors are thrown open in joyful welcome. The tradition was actually introduced by Spanish missionaries in the 1500s as a teaching tool, but indigenous communities adopted and transformed it into something uniquely Mexican. Today it is celebrated across Mexico, Central America, and U.S. Latino communities with piñatas, ponche (hot fruit punch), tamales, and buñuelos.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🍽️ Cultural Spotlight — Food</div>
+          <div class="section-content">
+            <strong>Make this weekend:</strong> <em>Ponche Navideño</em> — Mexican hot fruit punch, the unofficial drink of Las Posadas. It's made with tejocotes (hawthorn fruit), guavas, tamarind, hibiscus, cinnamon, piloncillo, and whatever seasonal fruit you have. Every family has their version. Search "ponche navideño recipe" and let the scent fill your kitchen. Adults often add a splash of rum or tequila — entirely optional but widely practiced.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">This is our last full week before the holidays — thank you to every member who has read, replied, shared a story, or volunteered a Heritage Spotlight this year. You are what makes HOLA worth running. ¡Gracias de corazón!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Weekend Note</div>
+          <div class="section-content">Enjoy the weekend — and if Las Posadas are part of your tradition, we hope they're filled with warmth. ¡Hasta el lunes!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEC 24 THURSDAY — Nochebuena -->
+    <div class="email-card nov-email">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — December 24 — ¡Feliz Nochebuena!</h3>
+        <span class="email-date">Dec 24, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">¡Feliz Nochebuena, familia! Tonight is the night. Whether your table has pernil, tamales, bacalao, lechón, or your abuela's secret recipe — tonight is about family, gratitude, and the people we love.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>Why Christmas Eve is the Real Celebration</strong><br><br>
+            In most of Latin America and Latino households in the United States, December 24 — Nochebuena — is the main event. The feast happens at night, families stay up past midnight, and gifts are often exchanged at 12:01 AM. December 25 is quieter — a day for leftovers, family visits, and rest. The tradition traces back to Catholic liturgical practice (midnight Mass marking the start of Christmas) merged with indigenous and African cultural rhythms of nighttime celebration. Nochebuena looks different in every country: Cuba has lechón asado and black beans; Puerto Rico has pernil and arroz con gandules; Mexico has tamales and ponche; Colombia has natilla and buñuelos. What they all share is the same spirit — la familia reunida.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🎵 Cultural Spotlight — Music</div>
+          <div class="section-content">
+            <strong>For your Nochebuena playlist:</strong> <em>"Noche de Paz"</em> (Silent Night in Spanish) in the José Feliciano version, followed by his iconic <em>"Feliz Navidad"</em> — one of the most recognizable holiday songs in the world, written and recorded by the Puerto Rican guitarist in 1970. Then add some classic aguinaldos (Puerto Rican Christmas carols) or villancicos from your family's region.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">From all of us at HOLA — thank you for a wonderful first season of Semana Nueva and Fin de Semana. This program exists because of your curiosity, your replies, your stories, and your willingness to show up for each other. We'll be back in the new year with more history, culture, and community. ¡Que tengan una hermosa Nochebuena!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Weekend Note</div>
+          <div class="section-content">Enjoy every moment with your families. See you in the new year. ¡Feliz Navidad y próspero Año Nuevo! 🎄</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEC 31 THURSDAY — New Year's Eve -->
+    <div class="email-card nov-email">
+      <div class="email-header thursday">
+        <span class="email-badge">Thursday</span>
+        <h3>Fin de Semana — December 31 — ¡Feliz Año Nuevo!</h3>
+        <span class="email-date">Dec 31, 2026</span>
+      </div>
+      <div class="email-body">
+        <div class="email-section">
+          <div class="section-label">👋 Opener</div>
+          <div class="section-content">¡Hola, familia! The last Fin de Semana of the year. Tonight, millions of Latino families will usher in the new year with rituals passed down through generations — and we want to celebrate with you.</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📖 Deep Dive</div>
+          <div class="section-content">
+            <strong>Latino New Year's Eve Traditions — Superstitions, Rituals & Joy</strong><br><br>
+            New Year's Eve across Latin America is one of the richest nights of the year for cultural tradition. At midnight, eat 12 grapes — one for each stroke of the clock — each representing a wish for the coming year. Wear yellow underwear for prosperity, red for love, white for peace. Sweep the house before midnight to push bad energy out the door. Walk a suitcase around the block if you want to travel in the new year. In some countries, families burn an effigy (<em>el año viejo</em>) stuffed with fireworks to symbolically destroy the hardships of the past year. In others, you pour water out the window to wash away bad luck. Every country, every family, every household has their version — and that's the beauty of it.
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🌎 Quote of the Year</div>
+          <div class="quote-block">
+            <em>"Podrán cortar todas las flores, pero no podrán evitar la primavera."</em><br>
+            <span style="font-size:0.85rem; color:#8a8480;">"They can cut all the flowers, but they cannot stop the spring." — Pablo Neruda</span>
+          </div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">📣 Community Corner</div>
+          <div class="section-content">As we close out 2026, thank you for everything you've brought to HOLA this year — your stories, your curiosity, your heritage, and your warmth. This community is richer because of each of you. We'll be back in January with a fresh season of Semana Nueva and Fin de Semana. What topics would you like to see? Reply and let us know!</div>
+        </div>
+        <div class="email-section">
+          <div class="section-label">🗓️ Tonight</div>
+          <div class="section-content">Don't forget the grapes. 🍇 ¡Feliz Año Nuevo, familia! See you in 2027.</div>
+        </div>
+      </div>
+    </div>
+
+  <div id="tab-calendar" class="tab-panel">
+    <div class="archive-controls">
+      <button class="toggle-archived-btn" id="toggle-archived-btn" onclick="toggleShowArchived()">👁 Show Archived</button>
+      <span class="archived-count" id="archived-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Event / Person</th>
+            <th>Country/Region</th>
+            <th>Category</th>
+            <th>Post Hook (1–2 sentences)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="month-header"><td colspan="6">MAY 2026</td></tr>
+          <tr>
+            <td>May 18</td><td>Mon</td>
+            <td>Francisco Madero enters Mexico City; Díaz resigns (1911)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>A turning point in the Mexican Revolution — 35 years of dictatorship ended in a single week.</td>
+          </tr>
+          <tr>
+            <td>May 21</td><td>Thu</td>
+            <td>The Soldaderas / Adelitas — Women of the Revolution</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>Women fought, spied, and commanded troops in the Mexican Revolution — and were largely erased from the history books.</td>
+          </tr>
+          <tr>
+            <td>May 25</td><td>Mon</td>
+            <td>Argentina's May Revolution — Primera Junta formed (1810)</td>
+            <td>Argentina</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>May 25 is Argentina's national day, marking the first independent government in the Río de la Plata region — a pivotal step toward full independence.</td>
+          </tr>
+          <tr>
+            <td>May 28</td><td>Thu</td>
+            <td>Birthday of José Hernández, author of Martín Fierro (1834)</td>
+            <td>Argentina</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Martín Fierro is considered the national epic of Argentina — a poem about identity, exile, and resistance on the pampas that still resonates today.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="6">JUNE 2026</td></tr>
+          <tr>
+            <td>June 1</td><td>Mon</td>
+            <td>Mario Molina awarded Nobel Prize in Chemistry (1995)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-science">Science</span></td>
+            <td>The first Mexican Nobel laureate in science — his research literally saved the ozone layer.</td>
+          </tr>
+          <tr>
+            <td>June 4</td><td>Thu</td>
+            <td>Ellen Ochoa — First Latina in space (1993)</td>
+            <td>USA (Mexican-American)</td>
+            <td><span class="cat-badge cat-science">Science</span></td>
+            <td>Ellen Ochoa didn't plan to be an astronaut — curiosity just kept pulling her forward.</td>
+          </tr>
+          <tr>
+            <td>June 8</td><td>Mon</td>
+            <td>Birthday of Gabriela Mistral, first Latin American Nobel Literature laureate (1889)</td>
+            <td>Chile</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>A poet, educator, and diplomat — Gabriela Mistral won the Nobel Prize in 1945 and changed how the world saw Latin American literature.</td>
+          </tr>
+          <tr>
+            <td>June 11</td><td>Thu</td>
+            <td>Puerto Rico becomes U.S. Territory (1900 — Foraker Act)</td>
+            <td>Puerto Rico</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>The Foraker Act formalized U.S. control of Puerto Rico — and sparked a debate about citizenship, sovereignty, and identity that continues today.</td>
+          </tr>
+          <tr>
+            <td>June 15</td><td>Mon</td>
+            <td>DACA Program announced (2012)</td>
+            <td>USA (Latino)</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>In 2012, DACA offered protection to nearly 800,000 young people raised in the United States — a policy that transformed millions of lives overnight.</td>
+          </tr>
+          <tr>
+            <td>June 18</td><td>Thu</td>
+            <td>Celia Cruz born (1925) — "La Reina de la Salsa"</td>
+            <td>Cuba</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>¡Azúcar! Celia Cruz defined an era of Latin music and became a global icon of joy, resilience, and Cuban identity.</td>
+          </tr>
+          <tr>
+            <td>June 22</td><td>Mon</td>
+            <td>Battle of Carabobo — Venezuelan Independence (1821)</td>
+            <td>Venezuela</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Simón Bolívar's decisive victory at Carabobo effectively secured Venezuela's independence from Spain.</td>
+          </tr>
+          <tr>
+            <td>June 24 → Thu Jun 25</td><td>Thu</td>
+            <td>🎉 Día de San Juan Bautista (Feast of St. John the Baptist)</td>
+            <td>Puerto Rico / Venezuela / Colombia / Spain</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>One of Puerto Rico's most beloved celebrations — tradition holds that walking into the ocean backwards at midnight brings good luck for the year ahead. Also celebrated across Venezuela, Colombia, and Spain with festivals and music. Feature in the June 25 Thursday post alongside Roberto Clemente.</td>
+          </tr>
+          <tr>
+            <td>June 25</td><td>Thu</td>
+            <td>Roberto Clemente's 3,000th hit (1972)</td>
+            <td>Puerto Rico</td>
+            <td><span class="cat-badge cat-sports">Sports</span></td>
+            <td>Roberto Clemente reached 3,000 career hits just months before his death — a milestone that sealed his legacy as one of baseball's greatest and most beloved figures. Pair with Día de San Juan for a full Puerto Rico spotlight this week.</td>
+          </tr>
+          <tr>
+            <td>June 29</td><td>Mon</td>
+            <td>🎉 Día de San Pedro y San Pablo + Pelé's first World Cup (1958)</td>
+            <td>Peru / Colombia / Brazil</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>June 29 is the Feast of Saints Peter and Paul — a major celebration in Peru, Colombia, and Chile with festivals and processions. It also marks the anniversary of Pelé's first World Cup title at age 17. A natural double feature: faith, culture, and sport all in one week.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="6">JULY 2026</td></tr>
+          <tr>
+            <td>July 5</td><td>Sun → Mon post</td>
+            <td>Venezuela Independence Day (1811)</td>
+            <td>Venezuela</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Venezuela declared independence on July 5, 1811 — the first South American nation to do so formally.</td>
+          </tr>
+          <tr>
+            <td>July 9</td><td>Thu</td>
+            <td>Argentina Independence Day (1816)</td>
+            <td>Argentina</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>July 9 is Argentina's Independence Day — declared in Tucumán, far from Buenos Aires, in a moment of remarkable political courage.</td>
+          </tr>
+          <tr>
+            <td>July 13</td><td>Mon</td>
+            <td>Birthday of Frida Kahlo (1907)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>Frida Kahlo turned personal pain into one of the most powerful bodies of art in history — and became a global symbol of resilience and identity.</td>
+          </tr>
+          <tr>
+            <td>July 16</td><td>Thu</td>
+            <td>Founding of La Paz, Bolivia (1548)</td>
+            <td>Bolivia</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>La Paz sits at nearly 12,000 feet above sea level — the highest capital city in the world, and one of Latin America's most culturally rich.</td>
+          </tr>
+          <tr>
+            <td>July 20</td><td>Mon</td>
+            <td>Colombia Independence Day (1810)</td>
+            <td>Colombia</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Colombia's declaration of independence on July 20 began with an argument over a flower vase — and ended Spanish colonial rule.</td>
+          </tr>
+          <tr>
+            <td>July 23</td><td>Thu</td>
+            <td>Birthday of García Lorca, Spanish poet and playwright (1898)</td>
+            <td>Spain</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Federico García Lorca's poetry and plays captured the soul of Andalusia — and his murder during the Spanish Civil War made him a martyr for artistic freedom.</td>
+          </tr>
+          <tr>
+            <td>July 25 → Mon Jul 27</td><td>Mon</td>
+            <td>🎉 Feast of Santiago (St. James) — Patron Saint of Spain & Puerto Rico</td>
+            <td>Spain / Puerto Rico</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>July 25 is the Feast of Santiago, patron saint of Spain — celebrated with one of the world's great pilgrimages along the Camino de Santiago. Puerto Rico also honors Santiago as part of its summer Fiestas Patronales. Combine with César Chávez in the July 27 Monday post as a cultural double feature.</td>
+          </tr>
+          <tr>
+            <td>July 27</td><td>Mon</td>
+            <td>César Chávez and the Delano Grape Strike begins (1965)</td>
+            <td>USA (Mexican-American)</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>César Chávez and Dolores Huerta led one of the longest and most impactful labor strikes in American history — and changed the lives of farmworkers forever.</td>
+          </tr>
+          <tr>
+            <td>July 28 → Thu Jul 30</td><td>Thu</td>
+            <td>🎉 Peru Independence Day (1821)</td>
+            <td>Peru</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>Peru declared independence from Spain on July 28, 1821 — proclaimed by liberator José de San Martín in Lima's main plaza. Peruvian Independence Day (Fiestas Patrias) is a two-day national celebration filled with music, food, and the iconic marinera dance. Feature in the July 30 Thursday post.</td>
+          </tr>
+          <tr>
+            <td>July 30</td><td>Thu</td>
+            <td>Member Heritage Spotlight (volunteer week)</td>
+            <td>USA / Multi</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>Use this Thursday for a member heritage spotlight — invite a volunteer to share their story in 3–4 sentences. Pair with Peru Independence Day for a rich cultural close to July.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="6">AUGUST 2026</td></tr>
+          <tr>
+            <td>Aug 3</td><td>Mon</td>
+            <td>Columbus departs Palos de la Frontera (1492)</td>
+            <td>Spain / Caribbean</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>August 3, 1492 — three ships left Spain and changed the world. Use this as a moment to reflect on the complex legacy of 1492 for Indigenous and Latino communities.</td>
+          </tr>
+          <tr>
+            <td>Aug 6</td><td>Thu</td>
+            <td>Bolivia Independence Day (1825)</td>
+            <td>Bolivia</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Named after Simón Bolívar himself, Bolivia declared independence on August 6 — a tribute to the Liberator's vision of a free South America.</td>
+          </tr>
+          <tr>
+            <td>Aug 10</td><td>Mon</td>
+            <td>Ecuador Independence Day (1809)</td>
+            <td>Ecuador</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Ecuador's first declaration of independence on August 10 is called the "Primer Grito de Independencia" — the First Cry of Independence.</td>
+          </tr>
+          <tr>
+            <td>Aug 13</td><td>Thu</td>
+            <td>Fall of Tenochtitlán (1521) — End of the Aztec Empire</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>The fall of Tenochtitlán in 1521 ended one of the greatest civilizations in human history — and began a colonial era whose effects are still felt in Mexico today.</td>
+          </tr>
+          <tr>
+            <td>Aug 17</td><td>Mon</td>
+            <td>Birthday of Simón Bolívar (1783)</td>
+            <td>Venezuela</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>"El Libertador" — Simón Bolívar liberated six countries and dreamed of a unified Latin America. His legacy is honored across the continent every year.</td>
+          </tr>
+          <tr>
+            <td>Aug 20</td><td>Thu</td>
+            <td>Rosario Castellanos — Mexican poet and feminist pioneer, born (1925)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Rosario Castellanos was one of Mexico's most important 20th-century voices — a poet and novelist who wrote unflinchingly about gender, indigenous identity, and power.</td>
+          </tr>
+          <tr>
+            <td>Aug 24</td><td>Mon</td>
+            <td>Sonia Sotomayor confirmed as Supreme Court Justice (2009)</td>
+            <td>USA (Puerto Rican)</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>Sonia Sotomayor became the first Hispanic and third woman to serve on the U.S. Supreme Court — a daughter of Puerto Rican immigrants who grew up in the Bronx.</td>
+          </tr>
+          <tr>
+            <td>Aug 27</td><td>Thu</td>
+            <td>Gabriel García Márquez born (1927)</td>
+            <td>Colombia</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Gabo — the father of magical realism. One Hundred Years of Solitude is one of the most translated books in history and transformed world literature forever.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="6">SEPTEMBER 2026 — HISPANIC HERITAGE MONTH (Sep 15 – Oct 15)</td></tr>
+          <tr>
+            <td>Sep 7</td><td>Mon</td>
+            <td>Brazil Independence Day (Sep 7, 1822)</td>
+            <td>Brazil</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Brazil's independence was declared by Emperor Dom Pedro I on the banks of the Ipiranga River — the famous "Grito do Ipiranga."</td>
+          </tr>
+          <tr>
+            <td>Sep 10</td><td>Thu</td>
+            <td>Hispanic Heritage Month Preview — Why Sep 15?</td>
+            <td>Multi-country</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>Hispanic Heritage Month starts September 15 — the independence day of five Latin American nations simultaneously. Here's why that date was chosen.</td>
+          </tr>
+          <tr>
+            <td>Sep 14</td><td>Mon</td>
+            <td>HHM Kickoff — Independence of Costa Rica, El Salvador, Guatemala, Honduras, Nicaragua (1821)</td>
+            <td>Central America</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>On September 15, 1821, five Central American nations declared independence from Spain on the same day — a remarkable coordinated act of liberation.</td>
+          </tr>
+          <tr>
+            <td>Sep 17</td><td>Thu</td>
+            <td>Mexico Independence Day (Sep 16 — El Grito)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Every September 16th, the President of Mexico rings the bell at the National Palace and delivers El Grito — the same cry for independence Father Hidalgo gave in 1810.</td>
+          </tr>
+          <tr>
+            <td>Sep 21</td><td>Mon</td>
+            <td>Dolores Huerta born (1930)</td>
+            <td>USA (Mexican-American)</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>"Sí se puede." Dolores Huerta co-founded the United Farm Workers with César Chávez and spent decades fighting for labor rights, women's rights, and Latino equality.</td>
+          </tr>
+          <tr>
+            <td>Sep 24</td><td>Thu</td>
+            <td>Dominican Republic Independence Day (Feb 27) — celebrated in HHM context</td>
+            <td>Dominican Republic</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>The Dominican Republic is the only country in the Americas to have won independence from another independent nation — Haiti — rather than a European power.</td>
+          </tr>
+          <tr>
+            <td>Sep 28</td><td>Mon</td>
+            <td>Pablo Neruda wins Nobel Prize in Literature (1971)</td>
+            <td>Chile</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Pablo Neruda's Nobel Prize in 1971 honored a poet who wrote about love, politics, and the sea with equal passion. His Odes remain some of the most beloved poetry ever written.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="6">OCTOBER 2026</td></tr>
+          <tr>
+            <td>Oct 1</td><td>Thu</td>
+            <td>HHM Mid-point — Spotlight on Afro-Latino history</td>
+            <td>Multi-country</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>Afro-Latino heritage is often overlooked in Hispanic Heritage Month conversations — this week, let's honor the African roots woven into Latin American culture, music, and identity.</td>
+          </tr>
+          <tr>
+            <td>Oct 5</td><td>Mon</td>
+            <td>Birthday of Pablo Neruda (1904)</td>
+            <td>Chile</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>"I want to do with you what spring does with the cherry trees." Neruda's birthday is a perfect moment to share a favorite poem with a colleague.</td>
+          </tr>
+          <tr>
+            <td>Oct 8</td><td>Thu</td>
+            <td>Che Guevara killed in Bolivia (1967) — a complex legacy</td>
+            <td>Argentina / Bolivia</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>Few figures in Latin American history are more debated than Che Guevara — revolutionary, icon, and cautionary tale. A good prompt for thoughtful conversation.</td>
+          </tr>
+          <tr>
+            <td>Oct 12</td><td>Mon</td>
+            <td>Día de la Raza / Día de la Hispanidad / Indigenous Peoples Day</td>
+            <td>Multi</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>October 12 is observed differently across the Americas — Columbus Day, Día de la Raza, Indigenous Peoples Day. What does it mean to your community?</td>
+          </tr>
+          <tr>
+            <td>Oct 15</td><td>Thu</td>
+            <td>Hispanic Heritage Month Closes — Reflection post</td>
+            <td>Multi</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>HHM ends today — but our stories don't. Use this Thursday to celebrate the month, thank contributors, and invite ideas for the next season.</td>
+          </tr>
+          <tr>
+            <td>Oct 19</td><td>Mon</td>
+            <td>Birthday of Miguel de Cervantes (1547)</td>
+            <td>Spain</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Don Quixote — published in 1605 — is considered the first modern novel and the greatest work in the Spanish language. Cervantes changed storytelling forever.</td>
+          </tr>
+          <tr>
+            <td>Oct 22</td><td>Thu</td>
+            <td>Arantxa Sánchez Vicario wins first US Open (1994)</td>
+            <td>Spain</td>
+            <td><span class="cat-badge cat-sports">Sports</span></td>
+            <td>Spain's Arantxa Sánchez Vicario was ranked #1 in the world and won four Grand Slam titles — one of the greatest tennis players Europe ever produced.</td>
+          </tr>
+          <tr>
+            <td>Oct 26</td><td>Mon</td>
+            <td>Birthday of Pablo Picasso (Oct 25, 1881)</td>
+            <td>Spain</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>Born in Málaga, Spain, Picasso co-founded Cubism and created Guernica — one of the most powerful anti-war paintings in history. His Spanish roots ran deep through every canvas.</td>
+          </tr>
+          <tr>
+            <td>Oct 29</td><td>Thu</td>
+            <td>🎉 Día de los Muertos preparations begin</td>
+            <td>Mexico / Multi-country</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>As October closes, markets across Mexico fill with cempasúchil — marigolds — whose petals guide spirits home. Families begin building their ofrendas this week. A perfect preview post for next Monday's Día de los Muertos feature.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="7">NOVEMBER 2026</td></tr>
+          <tr>
+            <td>Nov 2</td><td>Mon</td>
+            <td>🎉 Día de los Muertos (Nov 1–2)</td>
+            <td>Mexico / Latin America</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>Día de los Muertos is not a sad day — it is a joyful reunion with those who came before us, rooted in 3,000 years of Aztec tradition and woven together with Catholic All Saints' Day by Spanish colonizers.</td>
+          </tr>
+          <tr>
+            <td>Nov 5</td><td>Thu</td>
+            <td>Origins of Día de los Muertos — Aztec roots and colonial fusion</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>The Aztec festival honoring Mictecacihuatl, Lady of the Dead, was celebrated for an entire month. Spanish colonizers moved it to align with All Saints' Day — but could not erase it. The result is one of the world's most beautiful cultural fusions.</td>
+          </tr>
+          <tr>
+            <td>Nov 9</td><td>Mon</td>
+            <td>The Borinqueneers — 65th Infantry Regiment, U.S. Army</td>
+            <td>Puerto Rico / USA</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>The 65th Infantry Regiment — the Borinqueneers — was the only all–Puerto Rican unit in U.S. military history. They fought with extraordinary valor in Korea, earning a Congressional Gold Medal in 2016, despite facing discrimination at home and abroad.</td>
+          </tr>
+          <tr>
+            <td>Nov 12</td><td>Thu</td>
+            <td>Birthday of Carlos Fuentes, Mexican novelist (1928)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-literary">Literary</span></td>
+            <td>Carlos Fuentes put Mexico City on the literary map with his debut novel La región más transparente. A diplomat, essayist, and storyteller, he was one of the architects of the Latin American literary boom alongside García Márquez and Vargas Llosa.</td>
+          </tr>
+          <tr>
+            <td>Nov 16</td><td>Mon</td>
+            <td>🎉 Día de la Revolución Mexicana preview (Nov 20)</td>
+            <td>Mexico</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>November 20 is a national holiday in Mexico — the anniversary of the 1910 Revolution when Francisco Madero called the people to rise. This week is a natural moment to revisit the stories of Zapata, Villa, and the Adelitas.</td>
+          </tr>
+          <tr>
+            <td>Nov 19</td><td>Thu</td>
+            <td>🎉 Puerto Rico Discovery Day (1493)</td>
+            <td>Puerto Rico</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>On November 19, 1493, Columbus arrived on the island the Taíno people called Boriquén — beginning a history of colonization, resilience, and an unbreakable cultural identity that defines Puerto Rico to this day.</td>
+          </tr>
+          <tr>
+            <td>Nov 23</td><td>Mon</td>
+            <td>🎉 Día de la Revolución Mexicana (observed) + Thanksgiving week</td>
+            <td>Mexico / USA</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>¡Viva la Revolución! This week honors Mexico's most transformative national holiday. It's also Thanksgiving week — a chance to reflect on what gratitude looks like across Latino cultures, from pernil in Puerto Rico to tamales in Mexico.</td>
+          </tr>
+          <tr>
+            <td>Nov 26</td><td>Thu</td>
+            <td>Latino Thanksgiving traditions — Gratitud across cultures</td>
+            <td>Multi-country / USA</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>Thanksgiving looks different in every Latino household — pernil instead of turkey, rice and beans alongside stuffing, and abuela's flan for dessert. Share what gratitude looks like on your family's table. (Note: rotating Friday off this week — wish everyone a great long weekend!)</td>
+          </tr>
+          <tr>
+            <td>Nov 30</td><td>Mon</td>
+            <td>End of Atlantic Hurricane Season — Caribbean resilience</td>
+            <td>Caribbean / USA</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>November 30 marks the official end of Atlantic hurricane season — a date that carries deep meaning for Caribbean Latino communities who have lived through María, Irma, and generations of storms. A moment to honor resilience, mutual aid, and community strength.</td>
+          </tr>
+
+          <tr class="month-header"><td colspan="7">DECEMBER 2026</td></tr>
+          <tr>
+            <td>Dec 3</td><td>Thu</td>
+            <td>🎉 Día de la Inmaculada Concepción preview (Dec 8)</td>
+            <td>Latin America / Spain</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>December 8 is one of the most widely observed religious holidays across Latin America and Spain — the Feast of the Immaculate Conception, marked with candlelight processions, fireworks, and family gatherings from Buenos Aires to Seville.</td>
+          </tr>
+          <tr>
+            <td>Dec 7</td><td>Mon</td>
+            <td>Latino veterans of WWII — Guy Gabaldon and the Battle of Saipan (1944)</td>
+            <td>USA (Mexican-American)</td>
+            <td><span class="cat-badge cat-us-latino">U.S. Latino</span></td>
+            <td>Guy Gabaldon, a Mexican-American Marine from East Los Angeles, single-handedly convinced over 1,500 Japanese soldiers and civilians to surrender during the Battle of Saipan — one of the most remarkable feats of individual courage in WWII history.</td>
+          </tr>
+          <tr>
+            <td>Dec 10</td><td>Thu</td>
+            <td>Human Rights Day — Las Madres de Plaza de Mayo</td>
+            <td>Argentina</td>
+            <td><span class="cat-badge cat-political">Political</span></td>
+            <td>December 10 is International Human Rights Day. No story embodies its spirit more powerfully than las Madres de Plaza de Mayo — Argentine mothers who marched silently every Thursday for decades, demanding justice for their children disappeared by the dictatorship.</td>
+          </tr>
+          <tr>
+            <td>Dec 12 → Mon Dec 14</td><td>Mon</td>
+            <td>🎉 Día de Nuestra Señora de Guadalupe</td>
+            <td>Mexico / Latin America</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>December 12 is one of the most sacred dates in the Latino Catholic calendar — the feast day of the Virgen de Guadalupe, whose apparition to Juan Diego in 1531 became a cornerstone of Mexican national and spiritual identity, observed by millions worldwide.</td>
+          </tr>
+          <tr>
+            <td>Dec 16 → Thu Dec 17</td><td>Thu</td>
+            <td>🎉 Las Posadas begin (Dec 16–24)</td>
+            <td>Mexico / Central America / USA</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>Las Posadas — nine nights of candlelight processions reenacting Mary and Joseph's search for shelter in Bethlehem — begin December 16. From Mexico City to Los Angeles, the tradition fills neighborhoods with song, piñatas, ponche, and community warmth.</td>
+          </tr>
+          <tr>
+            <td>Dec 21</td><td>Mon</td>
+            <td>Winter Solstice — Andean and Mesoamerican traditions</td>
+            <td>Peru / Bolivia / Mexico</td>
+            <td><span class="cat-badge cat-cultural">Cultural</span></td>
+            <td>The winter solstice holds deep significance in Andean and Mesoamerican cultures. The Inca celebrated Inti Raymi to honor the sun god; the Maya built temples precisely aligned with solstice light. These traditions connect Latino heritage to some of humanity's oldest astronomical knowledge.</td>
+          </tr>
+          <tr>
+            <td>Dec 24</td><td>Thu</td>
+            <td>🎉 Nochebuena — Christmas Eve</td>
+            <td>All Latin America / USA</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>Nochebuena is the heart of the Latino holiday season — the night when families gather, pernil or tamales come out of the oven, and midnight Mass fills the streets with candlelight. In most Latino homes, December 24 is the celebration; December 25 is just the morning after. ¡Feliz Nochebuena!</td>
+          </tr>
+          <tr>
+            <td>Dec 28</td><td>Mon</td>
+            <td>🎉 Día de los Inocentes</td>
+            <td>All Latin America / Spain</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>December 28 is the Latino equivalent of April Fool's Day — Día de los Inocentes, rooted in the Biblical story of Herod's massacre of the innocents. Pranks, jokes, and playful mischief are all part of the tradition. Consider a fun, lighthearted post this week!</td>
+          </tr>
+          <tr>
+            <td>Dec 31</td><td>Thu</td>
+            <td>🎉 New Year's Eve — Latino traditions and superstitions</td>
+            <td>All Latin America / Spain</td>
+            <td><span class="cat-badge cat-holiday">Holiday</span></td>
+            <td>Latino New Year's Eve is a night of ritual: eat 12 grapes at midnight for luck, wear yellow for prosperity, sweep the house to push out bad energy, walk a suitcase around the block if you want to travel. Close the year with a warm reflection and an invitation to share your family's traditions.</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div><!-- end calendar tab -->
+
+  <!-- FORMAT GUIDE TAB -->
+  <div id="tab-format" class="tab-panel">
+    <div class="format-grid">
+      <div class="format-card">
+        <h4>📅 Monday — <em>Semana Nueva</em></h4>
+        <ul>
+          <li>👋 Brief warm greeting (2 sentences)</li>
+          <li>📅 <strong>This Week in History</strong> — 1 featured event, 3–4 sentences of context</li>
+          <li>🎉 <strong>Upcoming HOLA Events</strong> — bullet list</li>
+          <li>💬 <strong>Discussion Prompt</strong> — one open question to spark replies</li>
+          <li>🌎 <strong>Quote of the Week</strong> — one line from a notable figure</li>
+        </ul>
+      </div>
+      <div class="format-card">
+        <h4>🗓️ Thursday — <em>Fin de Semana</em></h4>
+        <ul>
+          <li>👋 Short opener (1–2 sentences)</li>
+          <li>📖 <strong>Deep Dive</strong> — expand Monday's topic OR introduce a second moment</li>
+          <li>🎵🍽️📚 <strong>Cultural Spotlight</strong> — rotate Music / Food / Book / Film weekly</li>
+          <li>📣 <strong>Community Corner</strong> — member shoutout, heritage spotlight, or call for volunteers</li>
+          <li>🗓️ <strong>Weekend Note</strong> — brief sign-off, mention rotating Friday off when applicable</li>
+        </ul>
+      </div>
+      <div class="format-card">
+        <h4>🎨 Tone Guidelines</h4>
+        <ul>
+          <li>Conversational, warm, never lecture-y</li>
+          <li>Sprinkle Spanish naturally (¡Hola!, ¡Hasta luego!, etc.) but keep it accessible</li>
+          <li>60 seconds to read — brevity is engagement</li>
+          <li>End Monday with a question that invites replies</li>
+          <li>Avoid political controversy — focus on history, culture, achievement</li>
+        </ul>
+      </div>
+      <div class="format-card">
+        <h4>📣 Engagement Boosters</h4>
+        <ul>
+          <li><strong>Heritage Spotlight</strong> — rotating member contributions (3–4 sentences)</li>
+          <li><strong>Trivia Variant</strong> — post question Monday, answer Thursday</li>
+          <li><strong>Cultural Spotlight Rotation</strong> — Music → Food → Book → Film (repeat)</li>
+          <li><strong>Reply encouragement</strong> — explicitly ask people to hit Reply</li>
+          <li><strong>HHM ramp-up</strong> — build excitement through September with daily-adjacent posts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:white; border-radius:10px; border:1px solid var(--border); padding:1.4rem;">
+      <h4 style="font-family:'Playfair Display',serif; margin-bottom:0.8rem;">🌎 Cultural Spotlight Rotation Schedule</h4>
+      <table style="font-size:0.88rem;">
+        <thead><tr style="background:var(--dark); color:var(--cream);"><th style="padding:0.5rem 0.8rem;">Week</th><th style="padding:0.5rem 0.8rem;">Thursday Spotlight</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem 0.8rem; border-bottom:1px solid var(--border);">Week 1</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid var(--border);">🎵 Music recommendation</td></tr>
+          <tr style="background:#F9F4EE;"><td style="padding:0.5rem 0.8rem; border-bottom:1px solid var(--border);">Week 2</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid var(--border);">📚 Book or film recommendation</td></tr>
+          <tr><td style="padding:0.5rem 0.8rem; border-bottom:1px solid var(--border);">Week 3</td><td style="padding:0.5rem 0.8rem; border-bottom:1px solid var(--border);">🍽️ Food / recipe / regional cuisine spotlight</td></tr>
+          <tr style="background:#F9F4EE;"><td style="padding:0.5rem 0.8rem;">Week 4</td><td style="padding:0.5rem 0.8rem;">📣 Member Heritage Spotlight (volunteer)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<script>
+  // ── Tab navigation ──────────────────────────────────────────────
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // ── Move Nov/Dec email cards into the email tab ──────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const emailTab = document.getElementById('tab-emails');
+    document.querySelectorAll('.nov-email').forEach(card => {
+      emailTab.appendChild(card);
+    });
+
+    initArchive();
+  });
+
+  // ── Archive functionality (localStorage) ────────────────────────
+  const ARCHIVE_KEY = 'hola_archived_rows';
+
+  function getArchived() {
+    try { return JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function saveArchived(arr) {
+    localStorage.setItem(ARCHIVE_KEY, JSON.stringify(arr));
+  }
+
+  function initArchive() {
+    const rows = document.querySelectorAll('#tab-calendar table tbody tr:not(.month-header)');
+    const archived = getArchived();
+    let showingArchived = false;
+
+    rows.forEach((row, i) => {
+      const id = 'row-' + i;
+      row.dataset.rowId = id;
+
+      // Archive button cell
+      const td = document.createElement('td');
+      const btn = document.createElement('button');
+      const isArchived = archived.includes(id);
+
+      btn.className = 'archive-btn' + (isArchived ? ' restore-btn' : '');
+      btn.textContent = isArchived ? '↩ Restore' : '📦 Archive';
+      btn.onclick = () => toggleArchive(id, row, btn);
+      td.appendChild(btn);
+      row.appendChild(td);
+
+      if (isArchived) row.classList.add('archived-row');
+    });
+
+    updateArchivedCount();
+  }
+
+  function toggleArchive(id, row, btn) {
+    const archived = getArchived();
+    const idx = archived.indexOf(id);
+    const isCurrentlyShowing = document.getElementById('toggle-archived-btn').dataset.showing === 'true';
+
+    if (idx === -1) {
+      // Archive it
+      archived.push(id);
+      row.classList.add('archived-row');
+      if (isCurrentlyShowing) row.classList.add('show-archived');
+      btn.textContent = '↩ Restore';
+      btn.classList.add('restore-btn');
+    } else {
+      // Restore it
+      archived.splice(idx, 1);
+      row.classList.remove('archived-row', 'show-archived');
+      btn.textContent = '📦 Archive';
+      btn.classList.remove('restore-btn');
+    }
+
+    saveArchived(archived);
+    updateArchivedCount();
+  }
+
+  function updateArchivedCount() {
+    const count = getArchived().length;
+    const badge = document.getElementById('archived-count');
+    if (badge) badge.textContent = count > 0 ? count + ' item' + (count !== 1 ? 's' : '') + ' archived' : '';
+  }
+
+  function toggleShowArchived() {
+    const btn = document.getElementById('toggle-archived-btn');
+    const showing = btn.dataset.showing === 'true';
+    const newState = !showing;
+
+    document.querySelectorAll('.archived-row').forEach(row => {
+      if (newState) row.classList.add('show-archived');
+      else row.classList.remove('show-archived');
+    });
+
+    btn.dataset.showing = newState;
+    btn.textContent = newState ? '🙈 Hide Archived' : '👁 Show Archived';
+  }
+</script>
+</body>
+</html>
